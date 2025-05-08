@@ -12,11 +12,11 @@ import cloudinary.uploader
 
 def get_all_mentors():
     with Session(engine) as session:
-        mentors = session.exec(select(Mentor).all())
+        mentors = session.exec(select(Mentor))
         mentor_list = []
         for mentor in mentors:
             user = session.get(User, mentor.user_id)
-            mentor_list.append({"mentor": mentor, "user": user})
+            mentor_list.append({"mentor": mentor, "user": user.username})
         return mentor_list
 
 
@@ -27,7 +27,7 @@ def get_mentor_by_id(mentor_id: int):
             return {"message": "Mentor no encontrado"}
 
         user = session.get(User, mentor.user_id)
-        return {"mentor": mentor, "user": user}
+        return {"mentor": mentor, "user": user.username}
 
 
 async def create_mentor_service(

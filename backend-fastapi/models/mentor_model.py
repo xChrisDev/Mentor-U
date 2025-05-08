@@ -5,6 +5,19 @@ from sqlalchemy import Enum as SQLAlchemyEnum
 from models.enums.constants import GenreEnum
 from models.mentor_technology_link import MentorTechnologyLink
 
+class Mentory(SQLModel, table=True):
+    __tablename__ = "mentories"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str = Field(index=True, nullable=False)
+    description: str = Field(nullable=False)
+    image: str = Field(nullable=False)
+    price: float = Field(nullable=False)
+    duration: int = Field(nullable=False)
+    max_students: int = Field(nullable=False)
+    
+    id_mentor: int = Field(foreign_key="mentors.id", nullable=False)
+    
+
 class Mentor(SQLModel, table=True):
     __tablename__ = "mentors"
 
@@ -24,7 +37,9 @@ class Mentor(SQLModel, table=True):
 
     technologies: List["Technologies"] = Relationship(
         back_populates="mentors", link_model=MentorTechnologyLink
-    )
+    ) 
+    
+    
 
 from models.technologies import Technologies
 
