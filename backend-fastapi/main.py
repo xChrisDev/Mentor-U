@@ -7,6 +7,7 @@ from routers import (
     mentor_controller,
     student_controller,
     mentories_controller,
+    chat_controller
 )
 
 app = FastAPI()
@@ -18,3 +19,4 @@ app.include_router(problem_controller.router)
 app.include_router(mentor_controller.router)
 app.include_router(student_controller.router)
 app.include_router(mentories_controller.router)
+app.include_router(chat_controller.router)

@@ -9,3 +9,4 @@ requests
 email-validator
 cloudinary
 python-multipart
+websockets

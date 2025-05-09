@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
-from typing import List, Optional
+from typing import Optional
 from services.mentor_services import (
     create_mentor_service,
     update_mentor_service,
