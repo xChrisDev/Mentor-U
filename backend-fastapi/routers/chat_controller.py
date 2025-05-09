@@ -26,7 +26,6 @@ async def private_chat(websocket: WebSocket):
 
     try:
         while True:
-            # Espera un JSON con { "to_user_id": 2, "message": "Hola" }
             data = await websocket.receive_json()
             to_user_id = data["to_user_id"]
             message = data["message"]
