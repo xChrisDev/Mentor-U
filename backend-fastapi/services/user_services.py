@@ -26,9 +26,7 @@ def register_user(username: str, password: str, email: str, role: str):
             return {"message": "Todos los campos son obligatorios"}
 
         if len(password) < 8:
-            return {
-                "message": "La contraseña debe tener al menos 8 caracteres"
-            }
+            return {"message": "La contraseña debe tener al menos 8 caracteres"}
 
         user = User(
             username=username, email=email, role=role, password=hash_password(password)
@@ -45,3 +43,55 @@ def login_user(username: str, password: str):
         if not user or not verify_password(password, user.password):
             return None
         return create_access_token(data={"sub": user.username})
+
+def delete_user(user_id: int):
+    with Session(engine) as session:
+        statement = select(User).where(User.id == user_id)
+        user = session.exec(statement).first()
+        if not user:
+            return {"message": "Usuario no encontrado"}
+        session.delete(user)
+        session.commit()
+        return {"message": "Cuenta eliminada correctamente"}
+
+def update_user(id: int, username: str, password: str, email: str, role: str):
+    with Session(engine) as session:
+        user = session.get(User, id)
+        if not user:
+            return {"message": "Error al encontrar usuario"}
+
+        if email:
+            try:
+                valid = validate_email(email)
+                email = valid.email
+            except EmailNotValidError as e:
+                return {"message": "Email no válido"}
+
+        if not username or not password or not email or not role:
+            return {"message": "Todos los campos son obligatorios"}
+
+        if len(password) < 8:
+            return {"message": "La contraseña debe tener al menos 8 caracteres"}
+
+        new_user = User(
+            username=username, email=email, role=role, password=hash_password(password)
+        )
+
+        existing_user = session.exec(
+            select(User).where(
+                or_(User.username == new_user.username, User.email == new_user.email)
+            )
+        ).first()
+
+        if existing_user:
+            return {"message": "El nombre de usuario o email ya está en uso"}
+
+        user.username = new_user.username
+        user.passwrod = new_user.password
+        user.email = new_user.email
+        
+        session.commit()
+
+        return {
+            "message": "Usuario actualizado correctamente"
+        }
