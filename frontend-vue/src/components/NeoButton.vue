@@ -10,7 +10,7 @@ const hoverBg = props.bg + 'CC'
 
 <template>
     <button
-        class="cursor-pointer flex text-black border-2 border-black p-2 rounded-lg transition-all font-semibold shadow-[4px_4px_0px_0px_black] hover:shadow-none hover:scale-105"
+        class="cursor-pointer flex text-black border-2 border-black p-2 rounded-lg transition-all font-semibold shadow-[4px_4px_0px_0px_black] hover:shadow-none hover:scale-[101%]"
         :style="{
             backgroundColor: bg,
             '--hover-bg': hoverBg

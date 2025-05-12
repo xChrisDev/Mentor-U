@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="relative min-h-screen w-full mb-4">
+  <div class="relative min-h-screen w-full pb-20">
     <div class="absolute inset-0 -z-10 h-full w-full
              bg-white
              bg-[radial-gradient(#edd_2px,transparent_1px)]

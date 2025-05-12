@@ -1,7 +1,10 @@
 <script setup>
-import NeoButton from './NeoButton.vue';
-import NeoContainer from './NeoContainer.vue';
+import { useRouter } from 'vue-router';
+import NeoButton from '../NeoButton.vue';
+import NeoContainer from '../NeoContainer.vue';
 
+
+const router = useRouter()
 </script>
 
 <template>
@@ -13,14 +16,14 @@ import NeoContainer from './NeoContainer.vue';
 
             <NeoContainer class="flex gap-8" bg="bg-[#EBDFFF]">
                 <a class="font-ppgosha font-normal text-lg rounded-lg px-2 hover:bg-[#D8C0FF] transition-all"
-                    href="#home">Home</a>
+                    href="#">Home</a>
                 <a class="font-ppgosha font-normal text-lg rounded-lg px-2 hover:bg-[#D8C0FF] transition-all"
-                    href="#services">Code</a>
+                    href="#">Code</a>
                 <a class="font-ppgosha font-normal text-lg rounded-lg px-2 hover:bg-[#D8C0FF] transition-all"
-                    href="#about-us">About Us</a>
+                    href="#">About Us</a>
             </NeoContainer>
 
-            <NeoButton text="Ingresar" icon="input" bg="#96FEAD" />
+            <NeoButton text="Ingresar" icon="input" bg="#96FEAD" @click="router.push('/login')"/>
         </nav>
     </div>
 </template>
