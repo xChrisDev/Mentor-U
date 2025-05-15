@@ -6,7 +6,7 @@ import DataRegisterPage from "../pages/DataRegisterPage.vue";
 const routes = [
   { path: "/", component: LandingPage },
   { path: "/login", component: LoginPage },
-  { path: "/login/data", component: DataRegisterPage}
+  { path: "/register", component: DataRegisterPage}
 ];
 
 const router = createRouter({
