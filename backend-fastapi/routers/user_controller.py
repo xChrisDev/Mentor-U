@@ -21,7 +21,7 @@ def login(user: UserLogin):
     return {"access_token": token, "token_type": "bearer"}
 
 
-@router.put("/update")
+@router.put("/update/{id_user}")
 def update_account(id_user: int, user: UserCreate):
     response = update_user(id_user, user.username, user.password, user.email, user.role)
     if not response:
@@ -29,7 +29,7 @@ def update_account(id_user: int, user: UserCreate):
     return response
 
 
-@router.delete("/delete")
+@router.delete("/delete/{id_user}")
 def delete_account(id_user: int):
     response = delete_user(id_user)
     if not response:

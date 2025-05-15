@@ -6,6 +6,15 @@ from email_validator import validate_email, EmailNotValidError
 from sqlalchemy import or_
 
 
+def get_user_by_id(user_id: int):
+    with Session(engine) as session:
+        user = session.get(Student, user_id)
+        if not user:
+            return {"message": "Estudiante no encontrado"}
+
+        user = session.get(User, student.user_id)
+        return {"student": student, "user": user.username}
+
 def register_user(username: str, password: str, email: str, role: str):
     with Session(engine) as session:
         existing_user = session.exec(
