@@ -78,3 +78,28 @@
 @theme {
     --font-ppgosha: "PPGoshaSans";
 }
+
+.Vue-Toastification__toast--default.my-custom-toast-class {
+    @apply flex items-center text-black border-2 border-black p-2 rounded-lg transition-all font-semibold shadow-[4px_4px_0px_0px_black]
+}
+
+.Vue-Toastification__toast--success.my-custom-toast-class {
+    @apply flex items-center text-green-900 bg-[#96FEAD] border-2 border-black p-2 rounded-lg transition-all font-semibold shadow-[4px_4px_0px_0px_#000];
+}
+
+.Vue-Toastification__toast--warning.my-custom-toast-class {
+    @apply flex items-center text-yellow-900 bg-[#FDD965] border-2 border-black p-2 rounded-lg transition-all font-semibold shadow-[4px_4px_0px_0px_#000];
+}
+
+.Vue-Toastification__toast--error.my-custom-toast-class {
+    @apply flex items-center text-red-950 bg-[#FF2C57] border-2 border-black p-2 rounded-lg transition-all font-semibold shadow-[4px_4px_0px_0px_#000];
+}
+
+.Vue-Toastification__toast--info.my-custom-toast-class {
+    @apply flex items-center text-blue-900 bg-[#F1E9FF] border-2 border-black p-2 rounded-lg transition-all font-semibold shadow-[4px_4px_0px_0px_#000];
+}
+
+.Vue-Toastification__toast.my-custom-toast-class .Vue-Toastification__close-button {
+  @apply text-black font-extrabold text-xl ml-2 bg-white border-2 border-black w-6 rounded-full h-6 flex items-center justify-center pr-2.5;
+  filter: drop-shadow(2px 2px 0 #ff3c00);
+}

@@ -1,8 +1,8 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import NeoContainer from '../components/NeoContainer.vue';
-import Login from '../components/session-page/Login.vue';
-import SignUp from '../components/session-page/SignUp.vue';
+import LoginForm from '../components/session-page/LoginForm.vue';
+import SignUpForm from '../components/session-page/SignUpForm.vue';
 
 const blobColors = ['#96FEAD', '#A0C4FF', '#FFADAD', '#FFD6A5'];
 const blobs = ref([]);
@@ -29,10 +29,10 @@ onMounted(() => {
             <NeoContainer bg="bg-white" class="w-full max-w-md p-8 flex flex-col gap-6">
                 <h2 class="text-3xl font-ppgosha font-bold mb-2">{{ isLogin ? 'Iniciar Sesión' : 'Registrarse' }}</h2>
                 <div v-if="isLogin" :key="isLogin">
-                    <Login />
+                    <LoginForm />
                 </div>
                 <div v-else>
-                    <SignUp />
+                    <SignUpForm />
                 </div>
 
                 <p class="text-sm text-center">

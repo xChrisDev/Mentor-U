@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const registerUser = async (data) => {
+export const registerUser = async (data) => {
   try {
     const response = await axios.post(
       "http://127.0.0.1:8000/api/users/register",
@@ -12,7 +12,7 @@ const registerUser = async (data) => {
   }
 };
 
-const loginUser = async () => {
+export const loginUser = async (data) => {
   try {
     const response = await axios.post(
       "http://127.0.0.1:8000/api/users/login",
@@ -24,7 +24,7 @@ const loginUser = async () => {
   }
 };
 
-const deleteAccount = async (id) => {
+export const deleteAccount = async (id) => {
   try {
     const response = await axios.delete(
       `http://127.0.0.1:8000/api/users/delete/${id}`
@@ -35,7 +35,7 @@ const deleteAccount = async (id) => {
   }
 };
 
-const updateUser = async (id, data) => {
+export const updateUser = async (id, data) => {
   try {
     const response = await axios.put(
       `http://127.0.0.1:8000/api/users/update/${id}`,
@@ -44,5 +44,16 @@ const updateUser = async (id, data) => {
     return response.data;
   } catch (error) {
     return { message: "Error al tratar de actualizar su información" };
+  }
+};
+
+export const getUserData = async (username) => {
+  try {
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/users/get_user_data/${username}`
+    );
+    return response.data;
+  } catch (error) {
+    return { message: "Error al tratar de obtener la información" };
   }
 };
