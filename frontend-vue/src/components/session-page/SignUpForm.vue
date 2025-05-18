@@ -2,6 +2,13 @@
 import { ref } from 'vue';
 import NeoButton from '../NeoButton.vue';
 import { registerUser } from '../../services/userService';
+import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
+import { useAuth } from '../../composables/useAuth';
+
+const router = useRouter()
+const { setUserData } = useAuth()
+const toast = useToast()
 
 const form = ref({
     email: '',
@@ -34,12 +41,30 @@ const fetchRegister = async () => {
         role: role_selected
     }
 
-    const res = await registerUser();
-    console.log(res)
+    const res = await registerUser(user);
+
+    if (res.user) {
+        setUserData({
+            id: res.user,
+            email: form.value.email,
+            username: form.value.username,
+            password: form.value.password,
+            role: role_selected
+        })
+        toast.success(res.message, {
+            toastClassName: "my-custom-toast-class",
+        });
+        router.push("/register")
+    } else {
+        toast.error(res.message, {
+            toastClassName: "my-custom-toast-class",
+        });
+    }
 }
 </script>
 
 <template>
+
     <form class="flex flex-col gap-4">
         <div class="flex flex-col gap-1 w-full">
             <label class="font-semibold text-sm lg:text-base" for="email"> Email </label>

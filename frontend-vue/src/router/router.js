@@ -4,20 +4,64 @@ import LoginPage from "../pages/LoginRegisterPage.vue";
 import DataRegisterPage from "../pages/DataRegisterPage.vue";
 import MentorHomePage from "../pages/MentorHomePage.vue";
 import StudentHomePage from "../pages/StudentHomePage.vue";
-import ErrorPage from '../pages/ErrorPage.vue'
+import ErrorPage from "../pages/ErrorPage.vue";
+import { useAuth } from "../composables/useAuth";
 
 const routes = [
   { path: "/", component: LandingPage },
   { path: "/error", component: ErrorPage },
-  { path: "/login", component: LoginPage },
-  { path: "/register", component: DataRegisterPage},
-  { path: "/home/mentor", component: MentorHomePage},
-  { path: "/home/student", component: StudentHomePage}
+  { path: "/login", component: LoginPage, meta: { guestOnly: true } },
+  { path: "/register", component: DataRegisterPage, meta: { guestOnly: true } },
+  {
+    path: "/home/mentor/:id",
+    component: MentorHomePage,
+    props: true,
+    meta: { requiresAuth: true, role: "mentor" },
+  },
+  {
+    path: "/home/student/:id",
+    component: StudentHomePage,
+    props: true,
+    meta: { requiresAuth: true, role: "student" },
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach(async (to, from, next) => {
+  const { fetchUser, isLogged, userData } = useAuth();
+
+  if (!isLogged.value) {
+    await fetchUser();
+  }
+
+  const isAuth = isLogged.value;
+  const role = userData.value?.role;
+  const realUserId = userData.value?.data?.user_id;
+
+  if (to.meta.requiresAuth) {
+    if (!isAuth) return next("/login");
+
+    if (to.meta.role && role !== to.meta.role) {
+      return next("/error");
+    }
+
+    if (to.params.id && to.params.id !== String(realUserId)) {
+      if (role === "mentor") return next(`/home/mentor/${realUserId}`);
+      if (role === "student") return next(`/home/student/${realUserId}`);
+    }
+  }
+
+  if (to.meta.guestOnly && isAuth) {
+    if (role === "mentor") return next(`/home/mentor/${realUserId}`);
+    if (role === "student") return next(`/home/student/${realUserId}`);
+    return next("/error");
+  }
+
+  next();
 });
 
 export default router;

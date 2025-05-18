@@ -103,3 +103,21 @@
   @apply text-black font-extrabold text-xl ml-2 bg-white border-2 border-black w-6 rounded-full h-6 flex items-center justify-center pr-2.5;
   filter: drop-shadow(2px 2px 0 #ff3c00);
 }
+
+.loader {
+  width: fit-content;
+  font-size: 40px;
+  font-family: system-ui,sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #0000;
+  -webkit-text-stroke: 1px #000;
+  background: conic-gradient(#000 0 0) 0/0% 100% no-repeat text;
+  animation: l1 1s linear infinite;
+}
+.loader:before {
+  content: "Loading";
+}
+@keyframes l1 {
+  to{background-size: 120% 100%}
+}

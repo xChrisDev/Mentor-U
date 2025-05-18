@@ -1,12 +1,13 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import NeoButton from '../NeoButton.vue';
-import { loginUser, getUserData } from '../../services/userService.js'
 import { useToast } from 'vue-toastification';
 import { useRouter } from 'vue-router';
+import { useAuth } from '../../composables/useAuth';
 
 const toast = useToast()
 const router = useRouter()
+const { login, fetchUser, isLogged, userData } = useAuth()
 
 const form = ref({
     username: '',
@@ -14,29 +15,29 @@ const form = ref({
 });
 
 const fetchLogin = async () => {
-    const response = await loginUser(form.value);
-    if (response.detail) {
-        toast.error(detail, {
-            toastClassName: "my-custom-toast-class",
-        });
-    }
+    const response = await login(form.value);
 
-    if (response.access_token) {
-        toast.success("Inicio de sesión autorizado", {
+    if (response?.data?.message) {
+        toast.success("Bienvenido " + response.data.user + "!", {
             toastClassName: "my-custom-toast-class",
         });
 
-        const data = await getUserData(form.value.username)
-        console.log(data)
-        if (data.role == "mentor") {
-            router.push('/home/mentor')
-        } else if (data.role == "student") {
-            router.push('/home/student')
+        const res = await fetchUser(); 
+        console.log(res); 
+
+        if (res.role === "mentor") {
+            router.push(`/home/mentor/${res.data.user_id}`);
+        } else if (res.role === "student") {
+            router.push(`/home/student/${res.data.user_id}`);
         } else {
-            router.push('/error')
+            router.push('/error');
         }
+    } else {
+        toast.error("Error al iniciar sesión", {
+            toastClassName: "my-custom-toast-class",
+        });
     }
-}
+};
 
 </script>
 

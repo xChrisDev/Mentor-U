@@ -29,6 +29,7 @@ export const postMentor = async (data) => {
     );
     return response.data;
   } catch (error) {
+    console.log(error)
     return { message: "Error inesperado al tratar agregar mentor" };
   }
 };

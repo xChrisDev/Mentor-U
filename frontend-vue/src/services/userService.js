@@ -12,18 +12,6 @@ export const registerUser = async (data) => {
   }
 };
 
-export const loginUser = async (data) => {
-  try {
-    const response = await axios.post(
-      "http://127.0.0.1:8000/api/users/login",
-      data
-    );
-    return response.data;
-  } catch (error) {
-    return { message: "Error al iniciar sesión" };
-  }
-};
-
 export const deleteAccount = async (id) => {
   try {
     const response = await axios.delete(

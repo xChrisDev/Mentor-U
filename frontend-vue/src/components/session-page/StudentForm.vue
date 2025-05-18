@@ -1,7 +1,19 @@
 <script setup>
 import { ref } from 'vue';
 import NeoButton from '../NeoButton.vue';
+import { useToast } from 'vue-toastification';
+import { postStudent } from '../../services/studentService';
+import { updateUser } from '../../services/userService';
+import { useAuth } from '../../composables/useAuth';
+import { useRouter } from 'vue-router';
 
+const { user } = useAuth()
+const toast = useToast()
+const router = useRouter()
+const emit = defineEmits('loading')
+const props = defineProps({
+    role: String
+})
 const form = ref({
     name: '',
     surname: '',
@@ -30,6 +42,45 @@ function handleFileChange(e) {
 function triggerFileSelect() {
     document.getElementById('fileInput').click();
 }
+
+const handleStudentSubmit = async () => {
+    if (props.role != 'student') {
+        const newUser = {
+            username: user.value.username,
+            email: user.value.email,
+            password: user.value.password,
+            role: 'student'
+        }
+        const userRes = await updateUser(user.value.id, newUser)
+        console.log(userRes)
+    }
+
+    let genre = ""
+    if (form.value.genre === "Masculino") { genre = "male" }
+    else if (form.value.genre === "Femenino") { genre = "female" }
+    else if (form.value.genre === "Prefiero no decirlo") { genre = "other" }
+
+    const formData = new FormData()
+    formData.append('user_id', user.value.id)
+    formData.append('name', form.value.name)
+    formData.append('surname', form.value.surname)
+    formData.append('genre', genre)
+    formData.append('file', form.value.file)
+
+    emit('loading')
+    const response = await postStudent(formData)
+    if (response.student_id) {
+        toast.success(response.message, {
+            toastClassName: "my-custom-toast-class",
+        });
+        emit('loading')
+        router.push('/home/student/' + response.student_id)
+    } else {
+        toast.error(response.message, {
+            toastClassName: "my-custom-toast-class",
+        });
+    }
+}
 </script>
 
 <template>
@@ -37,7 +88,7 @@ function triggerFileSelect() {
         <div class="flex gap-6">
             <div class="flex flex-col gap-1">
                 <label class="font-semibold text-sm lg:text-base"> Foto de perfil </label>
-                <div class="flex items-center justify-center border-[3px] border-black rounded-xl bg-white w-32 h-32 cursor-pointer relative overflow-hidden"
+                <div class="flex items-center hover:grayscale transition-all justify-center border-[3px] border-black rounded-xl bg-white w-32 h-32 cursor-pointer relative overflow-hidden"
                     @click="triggerFileSelect">
                     <input id="fileInput" type="file" accept="image/*" @change="handleFileChange" class="hidden" />
                     <img v-if="form.preview" :src="form.preview" alt="Preview" class="w-full h-full object-cover" />
@@ -88,12 +139,12 @@ function triggerFileSelect() {
             <div v-show="isDropdownOpen"
                 class="absolute top-full mt-2 left-0 right-0 border-[3px] border-black rounded-xl bg-white z-50">
                 <div v-for="option in genreOptions" :key="option" @click="selectOption(option)"
-                    class="px-4 py-2 cursor-pointer hover:bg-gray-200 text-sm lg:text-base border-b border-black last:border-none">
+                    class="px-4 py-2 rounded-xl cursor-pointer hover:bg-gray-200 text-sm lg:text-base border-black last:border-none">
                     {{ option }}
                 </div>
             </div>
         </div>
 
-        <NeoButton text="Continuar como estudiante" bg="#96FEAD" icon="arrow_forward" class="mt-4 justify-center" />
+        <NeoButton @click="handleStudentSubmit" text="Continuar como estudiante" bg="#96FEAD" icon="arrow_forward" class="mt-4 justify-center" />
     </form>
 </template>
