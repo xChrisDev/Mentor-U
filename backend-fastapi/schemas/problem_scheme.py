@@ -5,6 +5,8 @@ class ProblemCreate(BaseModel):
     topic: str
     level: str
     lang: str
+    id_mentor: int
+    id_mentorie: int
     
 class Example(BaseModel):
     input: str
@@ -23,6 +25,8 @@ class ProblemWithExamples(BaseModel):
     solution: str
     topic: str
     lang: str
+    id_mentor: int
+    id_mentorie: int
     examples: List[Example]
 
     class Config:

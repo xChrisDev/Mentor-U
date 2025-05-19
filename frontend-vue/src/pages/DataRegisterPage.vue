@@ -41,7 +41,7 @@ onMounted(() => {
     <div v-if="isLoading" class="flex justify-center items-center h-[80dvh]">
         <div class="loader" data-aos="zoom-in" data-aos-delay="100"></div>
     </div>
-    <div v-else class="flex justify-center items-center h-[80dvh]" data-aos="zoom-in" data-aos-delay="100">
+    <div v-else class="fixed inset-0 z-50 flex items-center justify-center" data-aos="zoom-in" data-aos-delay="100">
         <div class="flex flex-col gap-4 justify-center items-center w-full p-8">
             <NeoContainer bg="bg-white" class="w-full max-w-3xl min-h-[550px] p-8 flex flex-col gap-6">
                 <div class="flex items-center justify-between mb-2">

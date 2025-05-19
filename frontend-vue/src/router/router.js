@@ -6,12 +6,13 @@ import MentorHomePage from "../pages/MentorHomePage.vue";
 import StudentHomePage from "../pages/StudentHomePage.vue";
 import ErrorPage from "../pages/ErrorPage.vue";
 import { useAuth } from "../composables/useAuth";
+import MentorieDetailPage from "../pages/MentorieDetailPage.vue";
 
 const routes = [
   { path: "/", component: LandingPage },
   { path: "/error", component: ErrorPage },
   { path: "/login", component: LoginPage, meta: { guestOnly: true } },
-  { path: "/register", component: DataRegisterPage, meta: { guestOnly: true } },
+  { path: "/register", component: DataRegisterPage},
   {
     path: "/home/mentor/:id",
     component: MentorHomePage,
@@ -24,6 +25,12 @@ const routes = [
     props: true,
     meta: { requiresAuth: true, role: "student" },
   },
+  {
+    path: "/home/mentor/:id/mentories/:id_mentorie",
+    component: MentorieDetailPage,
+    props: true,
+    meta: { requiresAuth: true, role: "mentor" },
+  },
 ];
 
 const router = createRouter({
@@ -32,7 +39,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  const { fetchUser, isLogged, userData } = useAuth();
+  const { fetchUser, isLogged, userData, justRegistered } = useAuth();
 
   if (!isLogged.value) {
     await fetchUser();
@@ -44,21 +51,21 @@ router.beforeEach(async (to, from, next) => {
 
   if (to.meta.requiresAuth) {
     if (!isAuth) return next("/login");
-
-    if (to.meta.role && role !== to.meta.role) {
-      return next("/error");
-    }
-
+    if (to.meta.role && role !== to.meta.role) return next("/error");
     if (to.params.id && to.params.id !== String(realUserId)) {
       if (role === "mentor") return next(`/home/mentor/${realUserId}`);
       if (role === "student") return next(`/home/student/${realUserId}`);
     }
   }
 
-  if (to.meta.guestOnly && isAuth) {
-    if (role === "mentor") return next(`/home/mentor/${realUserId}`);
-    if (role === "student") return next(`/home/student/${realUserId}`);
-    return next("/error");
+  // if (to.meta.guestOnly && isAuth) {
+  //   if (role === "mentor") return next(`/home/mentor/${realUserId}`);
+  //   if (role === "student") return next(`/home/student/${realUserId}`);
+  //   return next("/error");
+  // }
+
+  if (to.meta.needsJustRegistered && !justRegistered.value) {
+    return next("/login");
   }
 
   next();

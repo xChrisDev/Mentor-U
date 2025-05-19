@@ -7,7 +7,7 @@ import { useAuth } from '../../composables/useAuth';
 
 const toast = useToast()
 const router = useRouter()
-const { login, fetchUser, isLogged, userData } = useAuth()
+const { login, fetchUser } = useAuth()
 
 const form = ref({
     username: '',
@@ -23,7 +23,7 @@ const fetchLogin = async () => {
         });
 
         const res = await fetchUser(); 
-        console.log(res); 
+        // console.log(res); 
 
         if (res.role === "mentor") {
             router.push(`/home/mentor/${res.data.user_id}`);

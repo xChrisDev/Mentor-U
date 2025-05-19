@@ -15,7 +15,14 @@ def get_all_mentories():
         return mentorie_list
 
 
-def get_mentories_by_id(mentory_id: int):
+def get_mentories_by_id(mentor_id: int):
+    with Session(engine) as session:
+        mentories = session.exec(select(Mentory).where(Mentory.id_mentor == mentor_id)).all()
+        if not mentories:
+            return {"message": "No hay mentorias registradas"}
+        return mentories
+    
+def get_mentorie_by_id(mentory_id: int):
     with Session(engine) as session:
         mentorie = session.get(Mentory, mentory_id)
         if not mentorie:
@@ -68,7 +75,7 @@ async def create_mentorie_service(
         session.commit()
 
         return {
-            "message": "Mentor registrado correctamente",
+            "message": "Mentoria registrada correctamente",
             "mentor_id": new_mentory.id,
             "profile_picture": profile_picture_url,
         }

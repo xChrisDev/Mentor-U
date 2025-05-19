@@ -24,5 +24,7 @@ class Problem(SQLModel, table=True):
     constraints: str = Field(sa_column=Column(Text), default="")
     topic: str = Field(index=True, nullable=False)
     lang: str = Field(index=True, nullable=False)
+    id_mentor: int = Field(foreign_key="mentors.id", nullable=False)
+    id_mentorie: int = Field(foreign_key="mentories.id", nullable=False)
 
     examples: List[Example] = Relationship(back_populates="problem")

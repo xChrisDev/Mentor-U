@@ -24,27 +24,33 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex justify-center items-center h-[80dvh]" data-aos="zoom-in" data-aos-delay="100">
-        <div class="flex flex-col justify-center items-center w-full lg:w-1/2 p-8">
-            <NeoContainer bg="bg-white" class="w-full max-w-md p-8 flex flex-col gap-6">
-                <h2 class="text-3xl font-ppgosha font-bold mb-2">{{ isLogin ? 'Iniciar Sesión' : 'Registrarse' }}</h2>
-                <div v-if="isLogin" :key="isLogin">
-                    <LoginForm />
-                </div>
-                <div v-else>
-                    <SignUpForm />
-                </div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center" data-aos="zoom-in" data-aos-delay="100">
+  <div class="w-full lg:w-1/2 p-4">
+    <NeoContainer bg="bg-white" class="w-full max-w-md p-8 flex flex-col gap-6 mx-auto">
+      <h2 class="text-3xl font-ppgosha font-bold mb-2">
+        {{ isLogin ? 'Iniciar Sesión' : 'Registrarse' }}
+      </h2>
 
-                <p class="text-sm text-center">
-                    {{ isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?' }}
-                    <button class="text-purple-600 font-semibold ml-1 cursor-pointer hover:underline"
-                        @click="isLogin = !isLogin">
-                        {{ isLogin ? 'Regístrate' : 'Inicia sesión' }}
-                    </button>
-                </p>
-            </NeoContainer>
-        </div>
-    </div>
+      <div v-if="isLogin" :key="isLogin">
+        <LoginForm />
+      </div>
+      <div v-else>
+        <SignUpForm />
+      </div>
+
+      <p class="text-sm text-center">
+        {{ isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?' }}
+        <button
+          class="text-purple-600 font-semibold ml-1 cursor-pointer hover:underline"
+          @click="isLogin = !isLogin"
+        >
+          {{ isLogin ? 'Regístrate' : 'Inicia sesión' }}
+        </button>
+      </p>
+    </NeoContainer>
+  </div>
+</div>
+
 
     <div class="fixed inset-0 -z-9 overflow-hidden pointer-events-none">
         <div v-for="(blob, index) in blobs" :key="index" class="absolute blob" :style="{

@@ -4,6 +4,7 @@ from services.mentories_services import (
     update_mentorie_service,
     delete_mentorie_service,
     get_mentories_by_id,
+    get_mentorie_by_id,
     get_all_mentories,
 )
 
@@ -62,10 +63,13 @@ def delete_mentory(mentory_id: int):
     return delete_mentorie_service(mentory_id)
 
 
-@router.get("/get/{mentory_id}")
-def get_mentory(mentory_id: int):
-    return get_mentories_by_id(mentory_id)
+@router.get("/get/{mentor_id}")
+def get_mentories(mentor_id: int):
+    return get_mentories_by_id(mentor_id)
 
+@router.get("/get/mentorie/{mentory_id}")
+def get_mentory(mentory_id: int):
+    return get_mentorie_by_id(mentory_id)
 
 @router.get("/all")
 def get_all():

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import selectinload
 
 
-def create_problem(topic: str, lang: str, level: str):
+def create_problem(topic: str, lang: str, level: str, id_mentor: int, id_mentorie: int):
     with Session(engine) as session:
         existing_problem = session.exec(
             select(Problem).where(
@@ -83,6 +83,8 @@ def create_problem(topic: str, lang: str, level: str):
                         solution=reply_json.get("solution"),
                         topic=topic,
                         lang=lang,
+                        id_mentor=id_mentor,
+                        id_mentorie=id_mentorie
                     )
                     session.add(problem)
                     session.commit()
@@ -121,6 +123,19 @@ def get_problem_by_id(problem_id: int):
         return problem
 
 
+def get_problem_by_mentorie_id(mentorie_id: int):
+    with Session(engine) as session:
+        statement = (
+            select(Problem)
+            .where(Problem.id_mentorie == mentorie_id)
+            .options(selectinload(Problem.examples))
+        )
+        problems = session.exec(statement).all()
+        if not problems:
+            return None
+        return problems
+
+
 def get_problems_by_lang(lang: str):
     with Session(engine) as session:
         statement = (
@@ -144,6 +159,8 @@ def update_problem(
     topic: str,
     lang: str,
     examples: list,
+    id_mentor : int,
+    id_mentorie: int
 ):
     with Session(engine) as session:
         statement = select(Problem).where(Problem.id == problem_id)
@@ -158,6 +175,8 @@ def update_problem(
         problem.solution = solution
         problem.topic = topic
         problem.lang = lang
+        problem.id_mentor = id_mentor
+        problem.id_mentorie = id_mentorie
 
         for ex in problem.examples:
             session.delete(ex)
@@ -185,10 +204,10 @@ def remove_problem(problem_id: int):
         problem = session.exec(statement).first()
         if not problem:
             return {"message": "Problema no encontrado"}
-        
+
         for ex in problem.examples:
             session.delete(ex)
-        
+
         session.delete(problem)
         session.commit()
         return {"message": "Problema eliminado correctamente"}

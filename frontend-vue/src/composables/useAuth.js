@@ -6,12 +6,17 @@ axios.defaults.withCredentials = true;
 export const user = ref(null);
 export const userData = ref(null);
 export const isLogged = ref(false);
+const justRegistered = ref(false);
 
 export function useAuth() {
   const setUserData = (data) => {
     user.value = data;
     userData.value = data;
     isLogged.value = true;
+  };
+
+  const setJustRegistered = (val) => {
+    justRegistered.value = val;
   };
 
   const clearUserData = () => {
@@ -66,6 +71,9 @@ export function useAuth() {
     login,
     logout,
     fetchUser,
-    clearUser
+    clearUser,
+    setUserData,
+    justRegistered,
+    setJustRegistered,
   };
 }

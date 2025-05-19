@@ -16,6 +16,17 @@ export const getMentorieByID = async (id) => {
     );
     return response.data;
   } catch (error) {
+    return { message: "Error al tratar de obtener las mentorias" };
+  }
+};
+
+export const getMentorieDetailByID = async (id) => {
+  try {
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/mentories/get/mentorie/${id}`
+    );
+    return response.data;
+  } catch (error) {
     return { message: "Error al tratar de obtener la mentoria" };
   }
 };

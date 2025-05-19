@@ -56,7 +56,7 @@ function triggerFileSelect() {
 }
 
 const handleMentorSubmit = async () => {
-    console.log(user.value)
+    // console.log(user.value)
     if (props.role != 'mentor') {
         const newUser = {
             username: user.value.username,
@@ -65,7 +65,7 @@ const handleMentorSubmit = async () => {
             role: 'mentor'
         }
         const userRes = await updateUser(user.value.id, newUser)
-        console.log(userRes)
+        // console.log(userRes)
     }
 
     let genre = ""
@@ -86,11 +86,11 @@ const handleMentorSubmit = async () => {
     emit('loading')
     const response = await postMentor(formData)
     if (response.mentor_id) {
+        emit('loading')
         toast.success(response.message, {
             toastClassName: "my-custom-toast-class",
         });
-        router.push('/home/mentor/' + response.mentor_id)
-        emit('loading')
+        router.push("/login")
     } else {
         toast.error(response.message, {
             toastClassName: "my-custom-toast-class",

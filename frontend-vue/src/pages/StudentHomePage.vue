@@ -2,18 +2,30 @@
 import { onMounted } from 'vue';
 import NeoButton from '../components/NeoButton.vue';
 import { useAuth } from '../composables/useAuth';
+import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 
-const { clearUser } = useAuth()
+const { clearUser, fetchUser, logout } = useAuth()
+const toast = useToast()
+const router = useRouter()
+const mentor = ref(null)
 defineProps({
   id: String
 })
 
-const fetchLogout = () => {
-  console.log("salir")
+const fetchLogout = async () => {
+  const res = await logout()
+  toast.success(res.data.message, {
+    toastClassName: "my-custom-toast-class",
+  });
+  router.push("/login")
 }
 
-onMounted(() => {
+onMounted(async () => {
   clearUser()
+  const res = await fetchUser();
+  mentor.value = res.data
+  console.log(mentor.value)
 })
 </script>
 

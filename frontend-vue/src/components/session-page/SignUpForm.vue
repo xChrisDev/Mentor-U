@@ -7,7 +7,7 @@ import { useToast } from 'vue-toastification';
 import { useAuth } from '../../composables/useAuth';
 
 const router = useRouter()
-const { setUserData } = useAuth()
+const { setUserData, setJustRegistered } = useAuth()
 const toast = useToast()
 
 const form = ref({
@@ -51,6 +51,7 @@ const fetchRegister = async () => {
             password: form.value.password,
             role: role_selected
         })
+        setJustRegistered(true);
         toast.success(res.message, {
             toastClassName: "my-custom-toast-class",
         });

@@ -17,7 +17,7 @@ onMounted(() => {
              [background-size:24px_24px]">
     </div>
 
-    <main class="container mx-auto w-[75%] pt-8">
+    <main>
       <RouterView />
     </main>
   </div>

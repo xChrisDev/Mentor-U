@@ -10,7 +10,7 @@ import TechSection from '../components/landing-page/TechSection.vue';
 </script>
 
 <template>
-    <div class="relative" data-aos="zoom-in" data-aos-delay="100">
+    <div class="relative contianer mx-auto w-[75%]" data-aos="zoom-in" data-aos-delay="100">
         <Navbar />
         <HeroSection data-aos="fade-up" data-aos-delay="300" />
         <BenefitsSection data-aos="fade-up" data-aos-delay="300" />
