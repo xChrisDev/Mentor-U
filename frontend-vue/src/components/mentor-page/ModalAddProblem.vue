@@ -9,7 +9,7 @@ const props = defineProps({
     id_mentor: Number,
     id_mentorie: Number
 });
-
+const emit = defineEmits(['update'])
 const toast = useToast();
 const modalRef = ref(null);
 const form = ref({
@@ -54,16 +54,20 @@ const handleConfirm = async () => {
             toast.success(response.message, {
                 toastClassName: "my-custom-toast-class",
             });
+            emit('update')
             modalRef.value?.close();
+            isLoading.value = false;
         } else {
             toast.error(response.message, {
                 toastClassName: "my-custom-toast-class",
             });
+            isLoading.value = false;
         }
     } catch (error) {
         toast.error("Ocurrió un error al generar el problema.", {
             toastClassName: "my-custom-toast-class",
         });
+        isLoading.value = false;
     } finally {
         isLoading.value = false;
     }
@@ -120,12 +124,11 @@ const handleConfirm = async () => {
                         </div>
                     </div>
                 </div>
-
-                <!-- Loader -->
-                <div v-if="isLoading" class="flex justify-center mt-4">
-                    <div class="loader" data-aos="zoom-in" data-aos-delay="100"></div>
-                </div>
             </form>
+            
+            <div v-if="isLoading" class="flex justify-center mt-4">
+                <div class="loader" data-aos="zoom-in" data-aos-delay="100"></div>
+            </div>
         </NeoModal>
     </div>
 </template>

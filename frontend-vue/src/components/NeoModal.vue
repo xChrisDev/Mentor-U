@@ -10,6 +10,10 @@ const props = defineProps({
     icon: {
         type: String,
         default: 'add'
+    },
+    bg: {
+        type: String,
+        default: '#96FEAD'
     }
 });
 
@@ -43,7 +47,7 @@ defineExpose({
 
 <template>
     <div v-if="isOpen"
-        class="fixed inset-0 z-40 w-screen h-screen bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+        class="fixed inset-0 z-40 w-full h-screen bg-black/60 backdrop-blur-sm transition-opacity duration-300"
         :class="{ 'opacity-100': !isClosing, 'opacity-0': isClosing }" style="left: 0; right: 0; margin: 0;"
         @click.self="close"></div>
 
@@ -55,11 +59,11 @@ defineExpose({
         'animate-scale-out': isClosing
     }">
 
-        <div class="flex items-center justify-center gap-2 mb-4 bg-[#96FEAD] p-1 border-3 rounded-lg">
+        <div class="flex items-center justify-center gap-2 mb-4 bg-[] p-1 border-3 rounded-lg" :style="{ backgroundColor: bg }">
             <span v-if="icon" class="material-symbols-rounded" style="font-size: 2rem;">{{ icon }}</span>
             <h2 class="text-2xl font-bold">{{ title }}</h2>
         </div>
- 
+
         <div class="mb-6">
             <slot />
         </div>

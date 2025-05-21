@@ -37,7 +37,7 @@ async def post_mentory(
 @router.put("/update/{mentory_id}")
 async def put_mentory(
     mentory_id: int,
-    mentor_id: int = Form(...),
+    id_mentor: int = Form(...),
     title: str = Form(...),
     description: str = Form(...),
     price: str = Form(...),
@@ -47,7 +47,7 @@ async def put_mentory(
 ):
     result = await update_mentorie_service(
         mentory_id=mentory_id,
-        mentor_id=mentor_id,
+        id_mentor=id_mentor,
         title=title,
         description=description,
         price=price,

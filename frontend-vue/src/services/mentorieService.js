@@ -53,6 +53,7 @@ export const putMentorie = async (id, data) => {
     );
     return response.data;
   } catch (error) {
+    console.log(error)
     return { message: "Error inesperado al tratar de editar mentoria" };
   }
 };

@@ -2,11 +2,11 @@
 import { ref } from 'vue';
 import NeoButton from '../NeoButton.vue';
 import NeoModal from '../NeoModal.vue';
-import { postMentorie } from '../../services/mentorieService';
+import { putMentorie } from '../../services/mentorieService';
 import { useToast } from 'vue-toastification';
 
 const props = defineProps({
-    id_mentor: Number
+    mentorie: Object
 })
 
 const emit = defineEmits(['update'])
@@ -14,11 +14,13 @@ const toast = useToast();
 const modalRef = ref(null);
 const isLoading = ref(false);
 const form = ref({
-    title: '',
-    description: '',
-    price: null,
-    duration: null,
-    max_students: null,
+    id_mentorie: props.mentorie.id,
+    id_mentor: props.mentorie.id_mentor,
+    title: props.mentorie.title,
+    description: props.mentorie.description,
+    price: props.mentorie.price,
+    duration: props.mentorie.duration,
+    max_students: props.mentorie.max_students,
     file: null,
     preview: null
 });
@@ -42,7 +44,7 @@ const openModal = () => {
 const handleConfirm = async () => {
     isLoading.value = true
     const formData = new FormData()
-    formData.append('id_mentor', props.id_mentor)
+    formData.append('id_mentor', form.value.id_mentor)
     formData.append('title', form.value.title)
     formData.append('description', form.value.description)
     formData.append('price', form.value.price)
@@ -50,7 +52,7 @@ const handleConfirm = async () => {
     formData.append('max_students', form.value.max_students)
     formData.append('image', form.value.file)
 
-    const response = await postMentorie(formData)
+    const response = await putMentorie(form.value.id_mentorie, formData)
     if (response.mentor_id) {
         toast.success(response.message, {
             toastClassName: "my-custom-toast-class",
@@ -70,9 +72,9 @@ const handleConfirm = async () => {
 
 <template>
     <div>
-        <NeoButton text="Nueva" bg="#96FEAD" icon="add_circle" @click="openModal" />
+        <NeoButton bg="#FFF6D1" icon="edit" @click="openModal" />
 
-        <NeoModal ref="modalRef" title="Nueva mentoria" icon="menu_book" @confirm="handleConfirm">
+        <NeoModal ref="modalRef" title="Editar mentoria" icon="menu_book" bg="#FFF6D1" @confirm="handleConfirm">
             <form class="flex flex-col gap-4">
                 <div class="flex flex-col gap-2">
                     <div class="flex flex-col gap-1">

@@ -12,7 +12,7 @@ defineProps({
     <div class="p-4 flex flex-col justify-between flex-1">
       <div>
         <h4 class="font-bold text-lg mb-1">{{ mentoria.title }}</h4>
-        <p class="text-sm mb-2 text-gray-800 line-clamp-3">
+        <p class="text-sm font-medium mb-2 text-gray-800 line-clamp-3">
           {{ mentoria.description }}
         </p>
       </div>

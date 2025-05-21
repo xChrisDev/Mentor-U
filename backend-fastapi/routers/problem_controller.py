@@ -56,9 +56,9 @@ def get_problem(problem_id: int):
 @router.get("/get/mentor/{mentorie_id}")
 def get_problem(mentorie_id: int):
     problems = get_problem_by_mentorie_id(mentorie_id)
-    if not problems:
-        raise HTTPException(status_code=404, detail="Problema no encontrado")
-    return problems
+    if problems:
+        # raise HTTPException(status_code=404, detail="Problema no encontrado")
+        return problems
 
 @router.get("/get/lang/{lang}", response_model=List[ProblemWithExamples])
 def get_problems_by_language(lang: str):

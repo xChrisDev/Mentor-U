@@ -7,6 +7,7 @@ import { getMentorieDetailByID } from '../services/mentorieService';
 import { getProblemsByMentorID } from '../services/problemService';
 import ModalAddProblem from '../components/mentor-page/ModalAddProblem.vue';
 import ProblemCard from '../components/mentor-page/ProblemCard.vue';
+import ModalUpdateMentorie from '../components/mentor-page/ModalUpdateMentorie.vue'
 
 const props = defineProps({
     id: String,
@@ -19,15 +20,10 @@ const problems = ref([]);
 const fetchMentorieDetail = async () => {
     mentorie.value = await getMentorieDetailByID(props.id_mentorie);
     problems.value = await getProblemsByMentorID(props.id_mentorie);
+    console.log(mentorie.value)
 };
 
 onMounted(fetchMentorieDetail);
-
-watch(problems, async (newVal, oldVal) => {
-    if (oldVal !== newVal) {
-        await fetchMentorieDetail();
-    }
-});
 
 // === BÚSQUEDA Y PAGINACIÓN ===
 const searchQuery = ref('');
@@ -63,28 +59,33 @@ watch(searchQuery, () => {
 </script>
 
 <template>
-    <div class="p-6 w-full flex flex-col items-center gap-6" data-aos="zoom-in" data-aos-delay="100">
+    <div class="pt-6 mx-auto flex flex-col justify-center items-center gap-6" data-aos="zoom-in" data-aos-delay="100">
         <!-- MENTORIE INFO -->
-        <NeoContainer class="w-full max-w-4xl bg-white border-2 border-black p-6">
+        <NeoContainer class="w-full flex flex-col max-w-4xl bg-white border-2 border-black p-6">
             <div class="flex flex-col md:flex-row gap-6 w-full">
-                <img :src="mentorie?.image" class="w-full md:w-64 h-64 object-cover rounded-md border-2 border-black" />
+                <img :src="mentorie?.image" class="w-full md:w-48 h-48 object-cover rounded-md border-2 border-black" />
 
-                <div class="flex flex-col justify-between w-full gap-4">
-                    <div class="flex justify-between">
+                <div class="flex flex-col w-full gap-4">
+
+                    <div class="flex flex-col">
                         <h2 class="text-3xl font-bold font-ppgosha">{{ mentorie?.title }}</h2>
-                        <div class="flex gap-2">
-                            <NeoButton bg="#FFF6D1" icon="edit" />
-                            <NeoButton bg="#FFADAD" icon="delete" />
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            <NeoTab icon="payments" :text="mentorie?.price > 0 ? `$${mentorie.price}` : 'Gratis'"
+                                bg="bg-[#F1E9FF]" />
+                            <NeoTab icon="schedule" :text="`Duración: ${mentorie?.duration}hr`" bg="bg-[#F1E9FF]" />
+                            <NeoTab icon="groups" :text="`Máx estudiantes: ${mentorie?.max_students}`"
+                                bg="bg-[#F1E9FF]" />
                         </div>
                     </div>
                     <p class="text-md font-medium">{{ mentorie?.description }}</p>
-
-                    <div class="flex flex-wrap gap-2 mt-2">
-                        <NeoTab icon="payments" :text="mentorie?.price > 0 ? `$${mentorie.price}` : 'Gratis'"
-                            bg="bg-[#F1E9FF]" />
-                        <NeoTab icon="schedule" :text="`Duración: ${mentorie?.duration}hr`" bg="bg-[#F1E9FF]" />
-                        <NeoTab icon="groups" :text="`Máx estudiantes: ${mentorie?.max_students}`" bg="bg-[#F1E9FF]" />
+                    <div class="flex justify-end gap-2">
+                        <!-- <NeoButton bg="#FFF6D1" icon="edit" /> -->
+                        <div v-if="mentorie">
+                            <ModalUpdateMentorie :mentorie="mentorie" @update="fetchMentorieDetail" />
+                        </div>
+                        <NeoButton bg="#FFADAD" icon="delete" />
                     </div>
+
                 </div>
             </div>
         </NeoContainer>
@@ -97,7 +98,8 @@ watch(searchQuery, () => {
                     <span class="material-symbols-rounded text-3xl mr-2">psychology_alt</span>
                     <h3 class="text-2xl font-bold">Problemas generados</h3>
                 </div>
-                <ModalAddProblem :id_mentor="Number(id)" :id_mentorie="Number(id_mentorie)" />
+                <ModalAddProblem :id_mentor="Number(id)" :id_mentorie="Number(id_mentorie)"
+                    @update="fetchMentorieDetail" />
             </div>
 
             <!-- BÚSQUEDA -->

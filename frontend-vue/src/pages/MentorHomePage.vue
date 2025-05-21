@@ -55,13 +55,6 @@ onMounted(async () => {
   // console.log(mentor.value);
 });
 
-watch(mentories, async (newVal, oldVal) => {
-  if (oldVal !== newVal) {
-    await fetchMentories();
-  }
-});
-
-
 </script>
 
 <template>
@@ -83,7 +76,7 @@ watch(mentories, async (newVal, oldVal) => {
           </div>
         </div>
         <div class="flex gap-4">
-          <ModalAddMentorie :id_mentor="mentor.id" />
+          <ModalAddMentorie :id_mentor="mentor.id" @update="fetchMentories"/>
           <NeoButton icon="settings" bg="#DDD" />
           <NeoButton icon="logout" bg="#FFADAD" @click="fetchLogout" />
         </div>
