@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
-from sqlalchemy import Column
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy import Enum as SQLAlchemyEnum
 from models.enums.constants import GenreEnum
 from models.mentor_model import Mentory
@@ -11,7 +11,17 @@ class Student(SQLModel, table=True):
     __tablename__ = "students"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id", unique=True, nullable=False)
+    
+    # CASCADE: Si se elimina un usuario, su perfil de estudiante también se elimina
+    user_id: int = Field(
+        sa_column=Column(
+            "user_id",
+            ForeignKey("users.id", ondelete="CASCADE"),
+            unique=True,
+            nullable=False
+        )
+    )
+    
     name: str = Field(index=True, nullable=False)
     surname: str = Field(index=True, nullable=False)
     profile_picture: str = Field(nullable=False)

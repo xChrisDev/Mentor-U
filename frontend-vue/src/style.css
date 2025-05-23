@@ -104,6 +104,13 @@
     filter: drop-shadow(2px 2px 0 #ff3c00);
 }
 
+.input-box {
+  @apply flex items-center border-[3px] border-black rounded-xl bg-white px-4 py-2;
+}
+.input-box input {
+  @apply w-full outline-none text-sm lg:text-base bg-transparent;
+}
+
 .loader {
     width: 48px;
     height: 48px;

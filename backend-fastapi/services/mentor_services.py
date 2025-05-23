@@ -2,6 +2,8 @@ from sqlmodel import Session, select
 from core.database import engine
 from models.mentor_model import Mentor, MentorTechnologyLink
 from models.enums.constants import GenreEnum
+from models.mentor_technology_link import MentorTechnologyLink
+from models.technologies import Technologies
 from fastapi import UploadFile
 from models.user_model import User
 from typing import List
@@ -28,7 +30,18 @@ def get_mentor_by_id(mentor_id: int):
 
         user = session.get(User, mentor.user_id)
         return {"mentor": mentor, "user": user.username}
-
+    
+    
+def get_technologies(mentor_id: int):
+    with Session(engine) as session:
+        statement = (
+            select(Technologies.name)
+            .join(MentorTechnologyLink, Technologies.id == MentorTechnologyLink.technology_id)
+            .where(MentorTechnologyLink.mentor_id == mentor_id)
+        )
+        results = session.exec(statement).all()
+        return results
+        
 
 async def create_mentor_service(
     user_id: int,
@@ -99,7 +112,6 @@ async def update_mentor_service(
     biography: str,
     specialization: str,
     genre: str,
-    technologies_ids: List[int],
     file: UploadFile = None,
 ):
     with Session(engine) as session:
@@ -134,14 +146,6 @@ async def update_mentor_service(
                 mentor.profile_picture = upload_result["secure_url"]
             except Exception as e:
                 return {"message": f"Error al subir imagen: {str(e)}"}
-
-        stmt = delete(MentorTechnologyLink).where(
-            MentorTechnologyLink.mentor_id == mentor.id
-        )
-        session.exec(stmt)
-        for tech_id in technologies_ids:
-            link = MentorTechnologyLink(mentor_id=mentor.id, technology_id=tech_id)
-            session.add(link)
 
         session.commit()
 

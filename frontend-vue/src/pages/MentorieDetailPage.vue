@@ -1,14 +1,18 @@
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
+import { getMentorieDetailByID } from '../services/mentorieService';
+import { getProblemsByMentorID } from '../services/problemService';
 import NeoContainer from '../components/NeoContainer.vue';
 import NeoButton from '../components/NeoButton.vue';
 import NeoTab from '../components/NeoTab.vue';
-import { getMentorieDetailByID } from '../services/mentorieService';
-import { getProblemsByMentorID } from '../services/problemService';
 import ModalAddProblem from '../components/mentor-page/ModalAddProblem.vue';
 import ProblemCard from '../components/mentor-page/ProblemCard.vue';
 import ModalUpdateMentorie from '../components/mentor-page/ModalUpdateMentorie.vue'
+import ModalDeleteMentorie from '../components/mentor-page/ModalDeleteMentorie.vue';
+import { useRouter } from 'vue-router';
 
+
+const router = useRouter()
 const props = defineProps({
     id: String,
     id_mentorie: String
@@ -20,12 +24,10 @@ const problems = ref([]);
 const fetchMentorieDetail = async () => {
     mentorie.value = await getMentorieDetailByID(props.id_mentorie);
     problems.value = await getProblemsByMentorID(props.id_mentorie);
-    console.log(mentorie.value)
 };
 
 onMounted(fetchMentorieDetail);
 
-// === BÚSQUEDA Y PAGINACIÓN ===
 const searchQuery = ref('');
 const currentPage = ref(1);
 const pageSize = 3;
@@ -78,14 +80,12 @@ watch(searchQuery, () => {
                         </div>
                     </div>
                     <p class="text-md font-medium">{{ mentorie?.description }}</p>
-                    <div class="flex justify-end gap-2">
-                        <!-- <NeoButton bg="#FFF6D1" icon="edit" /> -->
-                        <div v-if="mentorie">
+                    <div class="flex justify-end">
+                        <div v-if="mentorie" class="flex gap-2">
                             <ModalUpdateMentorie :mentorie="mentorie" @update="fetchMentorieDetail" />
-                        </div>
-                        <NeoButton bg="#FFADAD" icon="delete" />
+                            <ModalDeleteMentorie :mentorie="mentorie" @delete="router.push('/home/mentor/' + props.id)" />
+                        </div>                    
                     </div>
-
                 </div>
             </div>
         </NeoContainer>

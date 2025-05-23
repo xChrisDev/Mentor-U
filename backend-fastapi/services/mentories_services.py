@@ -17,11 +17,14 @@ def get_all_mentories():
 
 def get_mentories_by_id(mentor_id: int):
     with Session(engine) as session:
-        mentories = session.exec(select(Mentory).where(Mentory.id_mentor == mentor_id)).all()
+        mentories = session.exec(
+            select(Mentory).where(Mentory.id_mentor == mentor_id)
+        ).all()
         if not mentories:
             return {"message": "No hay mentorias registradas"}
         return mentories
-    
+
+
 def get_mentorie_by_id(mentory_id: int):
     with Session(engine) as session:
         mentorie = session.get(Mentory, mentory_id)
@@ -94,19 +97,16 @@ async def update_mentorie_service(
     with Session(engine) as session:
         mentory = session.get(Mentory, mentory_id)
         if not mentory:
-            return {"message": "Mentoria no encontrado"}
+            return {"message": "Mentoría no encontrada"}
 
         if (
             not title
             or not description
-            or not price
-            or not duration
-            or not max_students
+            or price is None
+            or duration is None
+            or max_students is None
         ):
             return {"message": "Todos los campos son obligatorios"}
-
-        if not image.content_type.startswith("image/"):
-            return {"message": "Solo se permiten archivos de imagen"}
 
         mentory.title = title
         mentory.description = description
@@ -115,6 +115,9 @@ async def update_mentorie_service(
         mentory.max_students = max_students
 
         if image:
+            if not image.content_type.startswith("image/"):
+                return {"message": "Solo se permiten archivos de imagen"}
+
             try:
                 file_bytes = await image.read()
                 upload_result = cloudinary.uploader.upload(
@@ -131,7 +134,7 @@ async def update_mentorie_service(
         session.commit()
 
         return {
-            "message": "Mentoria actualizado correctamente",
+            "message": "Mentoría actualizada correctamente",
             "mentor_id": mentory.id,
             "profile_picture": mentory.image,
         }

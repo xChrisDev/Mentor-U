@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form
+from typing import Optional
 from services.mentories_services import (
     create_mentorie_service,
     update_mentorie_service,
@@ -43,16 +44,16 @@ async def put_mentory(
     price: str = Form(...),
     duration: str = Form(...),
     max_students: str = Form(...),
-    image: UploadFile = File(...),
+    image: Optional[UploadFile] = File(None),
 ):
     result = await update_mentorie_service(
         mentory_id=mentory_id,
         id_mentor=id_mentor,
         title=title,
         description=description,
-        price=price,
-        duration=duration,
-        max_students=max_students,
+        price=float(price),
+        duration=int(duration),
+        max_students=int(max_students),
         image=image,
     )
     return result

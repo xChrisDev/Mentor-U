@@ -45,3 +45,14 @@ export const getUserData = async (username) => {
     return { message: "Error al tratar de obtener la información" };
   }
 };
+
+export const getUser = async (id) => {
+  try {
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/users/get_user_by_id/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    return { message: "Error al tratar de obtener la información" };
+  }
+};

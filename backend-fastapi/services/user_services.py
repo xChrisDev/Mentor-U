@@ -69,6 +69,14 @@ def get_role_by_user(username: str):
         return None
 
 
+def get_info_by_id(id: int):
+    with Session(engine) as session:
+        user = session.exec(select(User).where(User.id == id)).first()
+        if not user:
+            return None
+        return {"email": user.email, "username": user.username}
+
+
 def delete_user(user_id: int):
     with Session(engine) as session:
         statement = select(User).where(User.id == user_id)
@@ -84,20 +92,20 @@ def update_user(id: int, username: str, password: str, email: str, role: str):
     with Session(engine) as session:
         user = session.get(User, id)
         if not user:
-            return {"message": "Error al encontrar usuario"}
+            return {"error": "Error al encontrar usuario"}
 
         if email:
             try:
                 valid = validate_email(email)
                 email = valid.email
             except EmailNotValidError as e:
-                return {"message": "Email no válido"}
+                return {"error": "Email no válido"}
 
         if not username or not password or not email or not role:
-            return {"message": "Todos los campos son obligatorios"}
+            return {"error": "Todos los campos son obligatorios"}
 
         if len(password) < 8:
-            return {"message": "La contraseña debe tener al menos 8 caracteres"}
+            return {"error": "La contraseña debe tener al menos 8 caracteres"}
 
         new_user = User(
             username=username, email=email, role=role, password=hash_password(password)

@@ -20,6 +20,17 @@ export const getMentorByID = async (id) => {
   }
 };
 
+export const getTechsByID = async (id) => {
+  try {
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/mentors/${id}/technologies`
+    );
+    return response.data;
+  } catch (error) {
+    return { message: "Error al tratar de obtener las tecnologias" };
+  }
+};
+
 export const postMentor = async (data) => {
   try {
     const response = await axios.post(

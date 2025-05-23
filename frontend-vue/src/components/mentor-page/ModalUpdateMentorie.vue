@@ -22,7 +22,7 @@ const form = ref({
     duration: props.mentorie.duration,
     max_students: props.mentorie.max_students,
     file: null,
-    preview: null
+    preview: props.mentorie.image || null
 });
 
 function handleFileChange(e) {
@@ -50,7 +50,10 @@ const handleConfirm = async () => {
     formData.append('price', form.value.price)
     formData.append('duration', form.value.duration)
     formData.append('max_students', form.value.max_students)
-    formData.append('image', form.value.file)
+    if (form.value.file) {
+        formData.append('image', form.value.file)
+    }
+
 
     const response = await putMentorie(form.value.id_mentorie, formData)
     if (response.mentor_id) {

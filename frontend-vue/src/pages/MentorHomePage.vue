@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import NeoButton from '../components/NeoButton.vue';
 import NeoContainer from '../components/NeoContainer.vue';
 import NeoTab from '../components/NeoTab.vue';
@@ -7,19 +7,16 @@ import { useAuth } from '../composables/useAuth';
 import { useToast } from 'vue-toastification';
 import { useRouter } from 'vue-router';
 import MentorieCard from '../components/mentor-page/MentorieCard.vue';
+import { getTechsByID } from '../services/mentorService';
 import { getMentorieByID } from '../services/mentorieService';
 import ModalAddMentorie from '../components/mentor-page/ModalAddMentorie.vue';
-
-const techs = [
-  { id: 1, name: 'JavaScript' },
-  { id: 2, name: 'Python' },
-  { id: 3, name: 'Java' },
-];
+import ModalSettingsUser from '../components/mentor-page/ModalSettingsUser.vue';
 
 const { clearUser, fetchUser, logout } = useAuth()
 const toast = useToast()
 const router = useRouter()
 const mentories = ref([])
+const techs = ref([])
 const mentor = ref(null)
 
 const props = defineProps({
@@ -44,6 +41,11 @@ const fetchMentories = async () => {
   mentories.value = res
 }
 
+const fetchMentorTechs = async () => { 
+  const res = await getTechsByID(mentor.value.id)
+  techs.value = res
+}
+
 const handleMentorieDetails = (mentorie_id) => {
   router.push(`/home/mentor/${mentor.value.id}/mentories/${mentorie_id}`);
 }
@@ -52,6 +54,7 @@ onMounted(async () => {
   clearUser();
   await fetchMentorData();
   await fetchMentories();
+  await fetchMentorTechs();
   // console.log(mentor.value);
 });
 
@@ -76,8 +79,8 @@ onMounted(async () => {
           </div>
         </div>
         <div class="flex gap-4">
-          <ModalAddMentorie :id_mentor="mentor.id" @update="fetchMentories"/>
-          <NeoButton icon="settings" bg="#DDD" />
+          <ModalAddMentorie :id_mentor="mentor.id" @update="fetchMentories" />
+          <ModalSettingsUser :mentor="mentor" @settings="fetchLogout" />
           <NeoButton icon="logout" bg="#FFADAD" @click="fetchLogout" />
         </div>
       </div>
@@ -96,7 +99,7 @@ onMounted(async () => {
             <p class="text-md mt-1">{{ mentor?.specialization }}</p>
             <p class="text-sm font-medium mt-2">{{ mentor?.biography }}</p>
             <div class="flex flex-wrap gap-2 mt-3">
-              <NeoTab v-for="tech in techs" bg="bg-[#F1E9FF]" icon="code" :text="tech.name" />
+              <NeoTab v-for="tech in techs" bg="bg-[#F1E9FF]" icon="code" :text="tech" />
             </div>
           </div>
         </NeoContainer>
@@ -104,7 +107,7 @@ onMounted(async () => {
           <span class="material-symbols-rounded text-3xl mb-2" style="font-size: 3em;">groups</span>
           <h3 class=" text-xl font-bold">Estudiantes</h3>
           <p class="text-3xl font-bold mt-2">
-            7
+            0
           </p>
         </NeoContainer>
       </div>
@@ -115,7 +118,8 @@ onMounted(async () => {
           <h3 class="text-2xl font-bold">Tus mentorías</h3>
         </div>
         <div v-if="mentories.length" class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
-          <MentorieCard v-for="mentorie in mentories" :key="mentorie.id" :mentoria="mentorie" @click="handleMentorieDetails(mentorie.id)"/>
+          <MentorieCard v-for="mentorie in mentories" :key="mentorie.id" :mentoria="mentorie"
+            @click="handleMentorieDetails(mentorie.id)" />
         </div>
         <div v-else class="flex justify-center text-md text-black mt-4">
           <NeoContainer bg="bg-white shadow-none" class="w-fit mb-2">

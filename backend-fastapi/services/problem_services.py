@@ -7,6 +7,7 @@ from core.database import engine
 from models.problem_model import Problem, Example
 from dotenv import load_dotenv
 from sqlalchemy.orm import selectinload
+from fastapi.encoders import jsonable_encoder
 
 
 def create_problem(topic: str, lang: str, level: str, id_mentor: int, id_mentorie: int):
@@ -125,15 +126,44 @@ def get_problem_by_id(problem_id: int):
 
 def get_problem_by_mentorie_id(mentorie_id: int):
     with Session(engine) as session:
-        statement = (
-            select(Problem)
-            .where(Problem.id_mentorie == mentorie_id)
-            .options(selectinload(Problem.examples))
-        )
-        problems = session.exec(statement).all()
+        problems = session.exec(
+            select(Problem).where(Problem.id_mentorie == mentorie_id)
+        ).all()
+
         if not problems:
             return None
-        return problems
+
+        result = []
+        for problem in problems:
+            examples = session.exec(
+                select(Example).where(Example.problem_id == problem.id)
+            ).all()
+
+            result.append({
+                "id": problem.id,
+                "title": problem.title,
+                "description": problem.description,
+                "difficulty": problem.difficulty,
+                "solution": problem.solution,
+                "constraints": problem.constraints,
+                "topic": problem.topic,
+                "lang": problem.lang,
+                "id_mentor": problem.id_mentor,
+                "id_mentorie": problem.id_mentorie,
+                "examples": [
+                    {
+                        "id": e.id,
+                        "input": e.input,
+                        "output": e.output,
+                        "explanation": e.explanation,
+                        "problem_id": e.problem_id
+                    }
+                    for e in examples
+                ]
+            })
+
+        return result
+
 
 
 def get_problems_by_lang(lang: str):
@@ -143,7 +173,9 @@ def get_problems_by_lang(lang: str):
             .where(Problem.lang == lang)
             .options(selectinload(Problem.examples))
         )
+        
         problems = session.exec(statement).all()
+        
         if not problems:
             return None
         return problems
