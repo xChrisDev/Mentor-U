@@ -8,7 +8,7 @@ import { useToast } from 'vue-toastification';
 import { useRouter } from 'vue-router';
 import MentorieCard from '../components/mentor-page/MentorieCard.vue';
 import { getTechsByID } from '../services/mentorService';
-import { getMentorieByID } from '../services/mentorieService';
+import { getMentorieByID, getMentorStudentCount } from '../services/mentorieService';
 import ModalAddMentorie from '../components/mentor-page/ModalAddMentorie.vue';
 import ModalSettingsUser from '../components/mentor-page/ModalSettingsUser.vue';
 
@@ -18,6 +18,7 @@ const router = useRouter()
 const mentories = ref([])
 const techs = ref([])
 const mentor = ref(null)
+const studentCount = ref(0)
 
 const props = defineProps({
   id: String
@@ -34,6 +35,8 @@ const fetchLogout = async () => {
 const fetchMentorData = async () => {
   const res = await fetchUser();
   mentor.value = res.data
+  const response = await getMentorStudentCount(mentor.value.id)
+  studentCount.value = response.students_count
 }
 
 const fetchMentories = async () => {
@@ -47,7 +50,7 @@ const fetchMentorTechs = async () => {
 }
 
 const handleMentorieDetails = (mentorie_id) => {
-  router.push(`/home/mentor/${mentor.value.id}/mentories/${mentorie_id}`);
+  router.push(`/home/mentor/${mentor.value.user_id}/mentories/${mentorie_id}`);
 }
 
 onMounted(async () => {
@@ -107,7 +110,7 @@ onMounted(async () => {
           <span class="material-symbols-rounded text-3xl mb-2" style="font-size: 3em;">groups</span>
           <h3 class=" text-xl font-bold">Estudiantes</h3>
           <p class="text-3xl font-bold mt-2">
-            0
+            {{ studentCount || 0 }}
           </p>
         </NeoContainer>
       </div>

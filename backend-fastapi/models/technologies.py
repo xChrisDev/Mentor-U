@@ -6,7 +6,7 @@ from models.mentor_model import Mentor
 class Technologies(SQLModel, table=True):
     __tablename__ = "technologies"
     id: Optional[int] = Field(default=None, primary_key=True)
-    name: str
+    name: str = Field(nullable=False)  # Agregado nullable=False
 
     mentors: List[Mentor] = Relationship(
         back_populates="technologies", link_model=MentorTechnologyLink

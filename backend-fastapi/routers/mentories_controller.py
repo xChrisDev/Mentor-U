@@ -10,12 +10,11 @@ from services.mentories_services import (
     get_all_mentories,
     register_in_mentory,
     get_mentories_by_student_id,
+    get_students_count,
     get_mentorie_by_id_mentory
 )
 
 router = APIRouter(prefix="/api/mentories", tags=["Mentories"])
-
-
 
 
 @router.post("/enroll")
@@ -83,11 +82,9 @@ def get_mentories(mentor_id: int):
 def get_mentories(mentorie_id: int):
     return get_mentorie_by_id_mentory(mentorie_id)
 
-
 @router.get("/get/mentorie/{mentory_id}/{student_id}")
 def get_mentory(mentory_id: int, student_id: int):
     return get_mentorie_by_id(mentory_id, student_id)
-
 
 @router.get("/all/{student_id}")
 def get_all(student_id: int):
@@ -96,3 +93,7 @@ def get_all(student_id: int):
 @router.get("/{student_id}")
 def get_student_mentories(student_id: int):
     return get_mentories_by_student_id(student_id)
+
+@router.get("/{mentor_id}/count")
+def get_student_count_mentory(mentor_id: int):
+    return get_students_count(mentor_id)

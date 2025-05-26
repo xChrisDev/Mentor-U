@@ -1,8 +1,37 @@
-INSERT INTO technologies (name) VALUES 
-('JavaScript'),
-('Python'),
-('Java'),
-('C#'),
-('PHP'),
-('C++'),
-('Go');
+INSERT INTO `technologies` (`id`, `name`) VALUES (1, 'JavaScript');
+INSERT INTO `technologies` (`id`, `name`) VALUES (2, 'Python');
+INSERT INTO `technologies` (`id`, `name`) VALUES (3, 'Java');
+INSERT INTO `technologies` (`id`, `name`) VALUES (4, 'C#');
+INSERT INTO `technologies` (`id`, `name`) VALUES (5, 'PHP');
+INSERT INTO `technologies` (`id`, `name`) VALUES (6, 'C++');
+INSERT INTO `technologies` (`id`, `name`) VALUES (7, 'Go');
+
+
+INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`) VALUES (1, 'xChris', 'chris@gmail.com', '$2b$12$5wdGTuLhfOQ/Qopth0NhSeQVE3pFXmKpb7kIXT7sdLCBdgzc1reB.', 'mentor');
+INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`) VALUES (2, 'user', 'user@gmail.com', '$2b$12$Tj5JkYXjT.xndNoeiV2z3O/r5qoSmBiyHXNVEbxIkJThgp4gJoOIu', 'student');
+
+INSERT INTO `mentors` (`id`, `user_id`, `name`, `surname`, `biography`, `profile_picture`, `specialization`, `genre`) VALUES (1, 1, 'Christopher', 'Sarmiento', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s.', 'https://res.cloudinary.com/dxhjcaqpk/image/upload/v1748209852/mentor_u/profile_pictures/1_Christopher_Sarmiento.webp', 'Fullstack', 'male');
+INSERT INTO `students` (`id`, `user_id`, `name`, `surname`, `profile_picture`, `genre`) VALUES (1, 2, 'Chris', 'Sarmiento', 'https://res.cloudinary.com/dxhjcaqpk/image/upload/v1748210553/mentor_u/profile_pictures/2_Chris_Sarmiento.webp', 'male');
+
+INSERT INTO `mentor_technology_link` (`mentor_id`, `technology_id`) VALUES (1, 3);
+INSERT INTO `mentor_technology_link` (`mentor_id`, `technology_id`) VALUES (1, 2);
+
+INSERT INTO `mentories` (`id`, `title`, `description`, `image`, `price`, `duration`, `max_students`, `id_mentor`) VALUES (1, 'Introducción a JavaScript', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s', 'https://res.cloudinary.com/dxhjcaqpk/image/upload/v1748210145/mentor_u/mentories_pictures/1_Introducci%C3%B3n%20a%20JavaScript.jpg', 10, 12, 50, 1);
+INSERT INTO `mentories` (`id`, `title`, `description`, `image`, `price`, `duration`, `max_students`, `id_mentor`) VALUES (2, 'Desarrollo web con HTML/CSS', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s', 'https://res.cloudinary.com/dxhjcaqpk/image/upload/v1748210417/mentor_u/mentories_pictures/1_Desarrollo%20web%20con%20HTML/CSS.jpg', 5, 24, 15, 1);
+
+INSERT INTO `mentory_students_link` (`mentory_id`, `student_id`, `progress`, `status`) VALUES (1, 1, 50, 'in_progress');
+INSERT INTO `mentory_students_link` (`mentory_id`, `student_id`, `progress`, `status`) VALUES (2, 1, 0, 'not_started');
+
+INSERT INTO `student_problems_link` (`problem_id`, `student_id`, `status`) VALUES (1, 1, 'completado');
+INSERT INTO `student_problems_link` (`problem_id`, `student_id`, `status`) VALUES (2, 1, 'pendiente');
+INSERT INTO `student_problems_link` (`problem_id`, `student_id`, `status`) VALUES (4, 1, 'pendiente');
+
+INSERT INTO `problems` (`id`, `title`, `description`, `difficulty`, `solution`, `constraints`, `topic`, `lang`, `id_mentor`, `id_mentorie`) VALUES (1, 'Suma de Pares en un Arreglo', 'Dado un arreglo de números enteros, retorna la suma de todos los números pares presentes en el arreglo. Si no hay números pares, retorna 0.', 'facil', '```javascript\n/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sumOfEvenNumbers = function(nums) {\n    let sum = 0; // Inicializa la suma de números pares.\n\n    // Itera sobre cada número en el arreglo.\n    for (let i = 0; i < nums.length; i++) {\n        // Verifica si el número es par.\n        if (nums[i] % 2 === 0) {\n            // Si es par, suma el número a la variable sum.\n            sum += nums[i];\n        }\n    }\n\n    // Retorna la suma de todos los números pares.\n    return sum;\n};\n```', 'El arreglo `nums` tendrá una longitud entre 1 y 1000.  Cada elemento en `nums` estará entre 1 y 1000.', 'Arreglos', 'JavaScript', 1, 1);
+INSERT INTO `problems` (`id`, `title`, `description`, `difficulty`, `solution`, `constraints`, `topic`, `lang`, `id_mentor`, `id_mentorie`) VALUES (2, 'Encontrar el Elemento Mayor en un Subconjunto con una Condición', 'Dado un array de números enteros `nums` y un entero `k`. Debes encontrar el elemento mayor de todos los subconjuntos de `nums` que cumplen la siguiente condición: el subconjunto debe tener exactamente `k` elementos.', 'medio', '```javascript\n/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar findLargestElementInSubsets = function(nums, k) {\n  let maxOfMax = -Infinity; // Inicializamos con el valor más pequeño posible\n  const n = nums.length;\n\n  // Iteramos a través de todos los posibles subconjuntos\n  for (let i = 0; i < (1 << n); i++) {\n    const subset = [];\n    // Construimos el subconjunto actual\n    for (let j = 0; j < n; j++) {\n      if ((i >> j) & 1) {\n        subset.push(nums[j]);\n      }\n    }\n\n    // Verificamos si el subconjunto tiene el tamaño correcto\n    if (subset.length === k) {\n      let maxInSubset = -Infinity; // Inicializamos el máximo del subconjunto\n      // Encontramos el elemento mayor en el subconjunto\n      for (const num of subset) {\n        maxInSubset = Math.max(maxInSubset, num);\n      }\n      // Actualizamos el máximo general\n      maxOfMax = Math.max(maxOfMax, maxInSubset);\n    }\n  }\n\n  return maxOfMax;\n};\n```', '1 <= nums.length <= 1000\n1 <= k <= nums.length\n1 <= nums[i] <= 1000', 'Bucles', 'JavaScript', 1, 1);
+INSERT INTO `problems` (`id`, `title`, `description`, `difficulty`, `solution`, `constraints`, `topic`, `lang`, `id_mentor`, `id_mentorie`) VALUES (4, 'Calculadora de Ancho y Alto con Modelo de Caja', 'Implementa una función que, dado un ancho, alto, padding y border, calcule el ancho y alto total de un elemento usando el modelo de caja.', 'facil', '```html\n<!DOCTYPE html>\n<html>\n<head>\n  <title>Calculadora de Modelo de Caja</title>\n  <style>\n    #contenedor {\n      width: 100px;\n      height: 50px;\n      padding: 10px;\n      border: 2px solid black;\n      background-color: lightblue;\n      box-sizing: border-box; /* Importante para calcular correctamente el tamaño */\n    }\n  </style>\n</head>\n<body>\n\n  <div id="contenedor">\n    Este es un elemento de ejemplo.\n  </div>\n\n  <script>\n    // Función para calcular el ancho total\n    function calcularAnchoTotal(ancho, padding, border) {\n      return ancho + (padding * 2) + (border * 2);\n    }\n\n    // Función para calcular el alto total\n    function calcularAltoTotal(alto, padding, border) {\n      return alto + (padding * 2) + (border * 2);\n    }\n\n    // Valores de ejemplo\n    let ancho = 100; // Ancho del contenido\n    let alto = 50; // Alto del contenido\n    let padding = 10; // Padding en cada lado\n    let border = 2; // Borde en cada lado\n\n    // Calcular el ancho y alto total\n    let anchoTotal = calcularAnchoTotal(ancho, padding, border);\n    let altoTotal = calcularAltoTotal(alto, padding, border);\n\n    // Mostrar los resultados en la consola\n    console.log("Ancho total: " + anchoTotal + "px");\n    console.log("Alto total: " + altoTotal + "px");\n\n  </script>\n\n</body>\n</html>\n```', 'Los valores de ancho, alto, padding y border son números enteros no negativos.', 'Modelo de caja', 'HTML y CSS', 1, 2);
+
+INSERT INTO `examples` (`id`, `input`, `output`, `explanation`, `problem_id`) VALUES (1, 'nums = [1, 2, 3, 4, 5, 6]', '12', 'Los números pares en el arreglo son 2, 4 y 6.  La suma es 2 + 4 + 6 = 12.', 1);
+INSERT INTO `examples` (`id`, `input`, `output`, `explanation`, `problem_id`) VALUES (2, 'nums = [1, 3, 5, 7]', '0', 'No hay números pares en el arreglo, por lo tanto la suma es 0.', 1);
+INSERT INTO `examples` (`id`, `input`, `output`, `explanation`, `problem_id`) VALUES (3, 'nums = [2, 2, 2]', '6', 'Todos los números son pares. La suma es 2 + 2 + 2 = 6.', 1);
+INSERT INTO `examples` (`id`, `input`, `output`, `explanation`, `problem_id`) VALUES (4, 'nums = [1, 2, 3, 4], k = 2', '4', 'Los subconjuntos posibles de tamaño 2 son: [1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]. Los elementos mayores de cada subconjunto son: 2, 3, 4, 3, 4, 4. El mayor de estos es 4.', 2);
+INSERT INTO `examples` (`id`, `input`, `output`, `explanation`, `problem_id`) VALUES (5, 'nums = [3, 2, 1, 5, 6, 4], k = 3', '6', 'Algunos subconjuntos de tamaño 3 son: [3, 2, 1], [5, 6, 4]. Los elementos mayores de cada subconjunto son: 3, 6. El mayor de estos es 6.', 2);

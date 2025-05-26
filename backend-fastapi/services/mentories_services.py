@@ -108,7 +108,6 @@ def get_mentories_by_student_id(student_id: int):
 
         return mentorie_list
 
-
 def register_in_mentory(mentory_id: int, student_id: int):
     with Session(engine) as session:
         enroll = MentoryStudentLink(
@@ -133,6 +132,25 @@ def get_mentories_by_id(mentor_id: int):
         if not mentories:
             return {"message": "No hay mentorias registradas"}
         return mentories
+    
+def get_students_count(mentor_id: int):
+    with Session(engine) as session:
+        mentory_ids = session.exec(
+            select(Mentory.id).where(Mentory.id_mentor == mentor_id)
+        ).all()
+
+        if not mentory_ids:
+            return {"message": "No hay mentorias registradas para este mentor"}
+
+        student_ids = session.exec(
+            select(MentoryStudentLink.student_id).where(
+                MentoryStudentLink.mentory_id.in_(mentory_ids)
+            )
+        ).all()
+
+        unique_students = set(student_ids)
+
+        return {"students_count": len(unique_students)}
 
 
 def get_mentorie_by_id_mentory(mentory_id: int):

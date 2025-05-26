@@ -40,6 +40,17 @@ export const getMentorieDataByID = async (id) => {
   }
 };
 
+export const getMentorStudentCount = async (id) => {
+  try {
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/mentories/${id}/count`
+    );
+    return response.data;
+  } catch (error) {
+    return { message: "Error al tratar de obtener las mentorias" };
+  }
+};
+
 export const getMentorieDetailByID = async (id_mentorie, id_student) => {
   try {
     const response = await axios.get(

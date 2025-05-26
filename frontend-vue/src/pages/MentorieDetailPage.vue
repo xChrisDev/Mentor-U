@@ -22,18 +22,24 @@ const mentorie = ref(null);
 const problems = ref([]);
 
 const fetchMentorieDetail = async () => {
-    mentorie.value = await getMentorieDataByID(props.id_mentorie);
-    problems.value = await getProblemsByMentorID(props.id_mentorie);
+    try {
+        mentorie.value = await getMentorieDataByID(props.id_mentorie);
+        problems.value = await getProblemsByMentorID(props.id_mentorie);
+    } catch (error) {
+        console.log(error)
+    }
 };
 
-onMounted(fetchMentorieDetail);
+onMounted(async () => {
+    await fetchMentorieDetail();
+});
 
 const searchQuery = ref('');
 const currentPage = ref(1);
 const pageSize = 2;
 
 const filteredProblems = computed(() =>
-    problems.value.filter(problem =>
+    (problems.value ?? []).filter(problem =>
         problem.title.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
 );
@@ -83,8 +89,9 @@ watch(searchQuery, () => {
                     <div class="flex justify-end">
                         <div v-if="mentorie" class="flex gap-2">
                             <ModalUpdateMentorie :mentorie="mentorie" @update="fetchMentorieDetail" />
-                            <ModalDeleteMentorie :mentorie="mentorie" @delete="router.push('/home/mentor/' + props.id)" />
-                        </div>                    
+                            <ModalDeleteMentorie :mentorie="mentorie"
+                                @delete="router.push('/home/mentor/' + props.id)" />
+                        </div>
                     </div>
                 </div>
             </div>
