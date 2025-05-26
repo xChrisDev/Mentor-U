@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
-import { getMentorieDetailByID } from '../services/mentorieService';
+import { getMentorieDataByID } from '../services/mentorieService';
 import { getProblemsByMentorID } from '../services/problemService';
 import NeoContainer from '../components/NeoContainer.vue';
 import NeoButton from '../components/NeoButton.vue';
@@ -22,7 +22,7 @@ const mentorie = ref(null);
 const problems = ref([]);
 
 const fetchMentorieDetail = async () => {
-    mentorie.value = await getMentorieDetailByID(props.id_mentorie);
+    mentorie.value = await getMentorieDataByID(props.id_mentorie);
     problems.value = await getProblemsByMentorID(props.id_mentorie);
 };
 
@@ -30,7 +30,7 @@ onMounted(fetchMentorieDetail);
 
 const searchQuery = ref('');
 const currentPage = ref(1);
-const pageSize = 3;
+const pageSize = 2;
 
 const filteredProblems = computed(() =>
     problems.value.filter(problem =>

@@ -26,8 +26,8 @@ const getStatusColor = (status) => {
 const getStatusText = (status) => {
   switch(status) {
     case 'completed': return 'Completado'
-    case 'in_progress': return 'En Progreso'
-    case 'not_started': return 'No Iniciado'
+    case 'in_progress': return 'En curso'
+    case 'not_started': return 'No iniciado'
     default: return status
   }
 }

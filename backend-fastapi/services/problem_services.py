@@ -7,7 +7,8 @@ from core.database import engine
 from models.problem_model import Problem, Example
 from dotenv import load_dotenv
 from sqlalchemy.orm import selectinload
-from fastapi.encoders import jsonable_encoder
+from models.student_problems_link import StudentProblemLink
+from models.mentory_students_link import MentoryStudentLink
 
 
 def create_problem(topic: str, lang: str, level: str, id_mentor: int, id_mentorie: int):
@@ -110,7 +111,6 @@ def create_problem(topic: str, lang: str, level: str, id_mentor: int, id_mentori
                 print("Error al crear el problema:", str(e))
                 return None
 
-
 def get_problem_by_id(problem_id: int):
     with Session(engine) as session:
         statement = (
@@ -122,6 +122,170 @@ def get_problem_by_id(problem_id: int):
         if not problem:
             return None
         return problem
+
+def get_problems_by_mentory_and_student(mentory_id: int, student_id: int):
+    with Session(engine) as session:
+        # Obtener todos los problemas de esa mentoría
+        problems = session.exec(
+            select(Problem).where(Problem.id_mentorie == mentory_id)
+        ).all()
+
+        results = []
+
+        for problem in problems:
+            # Verificar si ya existe el vínculo
+            link = session.exec(
+                select(StudentProblemLink).where(
+                    (StudentProblemLink.problem_id == problem.id) &
+                    (StudentProblemLink.student_id == student_id)
+                )
+            ).first()
+
+            # Si no existe, crearlo como pendiente
+            if not link:
+                link = StudentProblemLink(
+                    problem_id=problem.id,
+                    student_id=student_id,
+                    status="pendiente"
+                )
+                session.add(link)
+                session.commit()
+                session.refresh(link)
+
+            # Obtener los ejemplos del problema
+            examples = session.exec(
+                select(Example).where(Example.problem_id == problem.id)
+            ).all()
+
+            results.append({
+                "id": problem.id,
+                "title": problem.title,
+                "description": problem.description,
+                "difficulty": problem.difficulty,
+                "solution": problem.solution,
+                "constraints": problem.constraints,
+                "topic": problem.topic,
+                "lang": problem.lang,
+                "id_mentor": problem.id_mentor,
+                "id_mentorie": problem.id_mentorie,
+                "examples": [
+                    {
+                        "id": e.id,
+                        "input": e.input,
+                        "output": e.output,
+                        "explanation": e.explanation,
+                        "problem_id": e.problem_id
+                    } for e in examples
+                ],
+                "status": link.status
+            })
+
+        return results
+
+        
+def update_mentory_progress(student_id: int, mentory_id: int):
+    with Session(engine) as session:
+        # Obtener todos los problemas de esa mentoría
+        all_problems = session.exec(
+            select(Problem).where(Problem.id_mentorie == mentory_id)
+        ).all()
+
+        total_problems = len(all_problems)
+        if total_problems == 0:
+            return {"message": "No hay problemas registrados para esta mentoría."}
+
+        # Obtener todos los problemas que el estudiante ha completado en esta mentoría
+        completed_count = 0
+        for problem in all_problems:
+            link = session.exec(
+                select(StudentProblemLink).where(
+                    (StudentProblemLink.problem_id == problem.id) &
+                    (StudentProblemLink.student_id == student_id) &
+                    (StudentProblemLink.status == "completado")
+                )
+            ).first()
+
+            if link:
+                completed_count += 1
+
+        # Calcular el progreso (entero entre 0 y 100)
+        progress = int((completed_count / total_problems) * 100)
+
+        # Buscar el enlace entre estudiante y mentoría
+        mentory_link = session.exec(
+            select(MentoryStudentLink).where(
+                (MentoryStudentLink.student_id == student_id) &
+                (MentoryStudentLink.mentory_id == mentory_id)
+            )
+        ).first()
+
+        if not mentory_link:
+            mentory_link = MentoryStudentLink(
+                student_id=student_id,
+                mentory_id=mentory_id,
+                progress=progress,
+                status=(
+                    "not_started" if progress == 0 else
+                    "completed" if progress == 100 else
+                    "in_progress"
+                )
+            )
+            session.add(mentory_link)
+        else:
+            mentory_link.progress = progress
+            mentory_link.status = (
+                "not_started" if progress == 0 else
+                "completed" if progress == 100 else
+                "in_progress"
+            )
+
+        session.commit()
+        session.refresh(mentory_link)
+
+        return {
+            "mentory_id": mentory_id,
+            "student_id": student_id,
+            "progress": progress,
+            "status": mentory_link.status
+        }
+        
+
+def update_problem_status(student_id: int, problem_id: int, status: str):
+    with Session(engine) as session:
+        # Obtener o crear el vínculo problema-estudiante
+        link = session.exec(
+            select(StudentProblemLink).where(
+                (StudentProblemLink.student_id == student_id) &
+                (StudentProblemLink.problem_id == problem_id)
+            )
+        ).first()
+
+        if not link:
+            link = StudentProblemLink(
+                student_id=student_id,
+                problem_id=problem_id,
+                status=status
+            )
+            session.add(link)
+        else:
+            link.status = status
+
+        session.commit()
+
+        # Obtener el problema para saber a qué mentoría pertenece
+        problem = session.get(Problem, problem_id)
+        if not problem:
+            return {"message": "Problema no encontrado."}
+
+        # Llamar al servicio que actualiza el progreso de la mentoría
+        updated_progress = update_mentory_progress(student_id, problem.id_mentorie)
+
+        return {
+            "message": "Estado actualizado correctamente.",
+            "problem_id": problem_id,
+            "new_status": status,
+            "mentory_progress": updated_progress
+        }
 
 
 def get_problem_by_mentorie_id(mentorie_id: int):
@@ -164,8 +328,6 @@ def get_problem_by_mentorie_id(mentorie_id: int):
 
         return result
 
-
-
 def get_problems_by_lang(lang: str):
     with Session(engine) as session:
         statement = (
@@ -179,7 +341,6 @@ def get_problems_by_lang(lang: str):
         if not problems:
             return None
         return problems
-
 
 def update_problem(
     problem_id: int,
@@ -228,7 +389,6 @@ def update_problem(
         session.refresh(problem)
 
         return {"message": "Problema actualizado correctamente", "problem": problem}
-
 
 def remove_problem(problem_id: int):
     with Session(engine) as session:

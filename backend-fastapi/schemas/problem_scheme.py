@@ -1,6 +1,19 @@
 from pydantic import BaseModel
 from typing import List
 
+class ProblemStatus(BaseModel):
+    problem_id: int
+    student_id: int
+    
+class ProblemProgress(BaseModel):
+    mentory_id: int
+    student_id: int
+    
+class ProblemStatusUpdate(BaseModel):
+    problem_id: int
+    student_id: int
+    status: str
+
 class ProblemCreate(BaseModel):
     topic: str
     level: str

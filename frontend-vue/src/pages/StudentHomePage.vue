@@ -6,7 +6,7 @@
         <div class="hidden md:flex md:flex-col">
           <div class="flex items-center gap-4">
             <img :src="student?.profile_picture || '/default-avatar.png'" alt="Profile"
-              class="w-24 h-full object-cover border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_black]" />
+              class="w-22 h-full object-cover border-2 rounded-full" />
             <div>
               <h1 class="text-4xl font-ppgosha font-bold mb-1 flex items-center gap-3">
                 ¡Hola, {{ student?.name }} {{ student?.surname }}!
@@ -146,11 +146,11 @@ const router = useRouter();
 const student = ref(null);
 const allMentories = ref([]);
 const enrolledMentories = ref([]);
-const activeTab = ref('discover');
+const activeTab = ref('enrolled');
 const isLoading = ref(false);
 const searchQuery = ref('');
 
-defineProps({ id: String });
+const props = defineProps({ id: String });
 
 const fetchStudentData = async () => {
   const res = await fetchUser();
@@ -207,7 +207,7 @@ const handleMentorieEnroll = async (mentorieId) => {
 };
 
 const handleMentorieDetails = (mentorieId) => {
-  router.push(`/home/student/${student.value.id}/mentories/${mentorieId}`);
+  router.push(`/home/student/${props.id}/mentories/${mentorieId}`);
 };
 
 const filteredMentories = computed(() =>

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from schemas.problem_scheme import ProblemCreate, ProblemWithExamples
+from schemas.problem_scheme import ProblemCreate, ProblemWithExamples, ProblemProgress
 from typing import List 
 from services.problem_services import (
     create_problem,
@@ -7,7 +7,10 @@ from services.problem_services import (
     get_problems_by_lang,
     get_problem_by_mentorie_id,
     update_problem,
-    remove_problem
+    remove_problem,
+    get_problems_by_mentory_and_student,
+    update_problem_status,
+    update_mentory_progress
 )
 
 router = APIRouter(prefix="/api/problems", tags=["Problems"])
@@ -39,6 +42,14 @@ def put_problem(problem_id: int, problem: ProblemWithExamples):
         raise HTTPException(status_code=404, detail="Problema no encontrado")
     return response
 
+@router.put("/{problem_id}/status")
+def update_status(problem_id: int, student_id: int, status: str):
+    return update_problem_status(student_id, problem_id, status)
+
+@router.put("/{mentorie_id}/progress",)
+def update_progress(mentorie_id: int, problem: ProblemProgress):
+    return update_mentory_progress(student_id=problem.student_id, mentory_id=mentorie_id)
+
 @router.delete("/delete/{problem_id}")
 def delete_problem(problem_id: int):
     response = remove_problem(problem_id)
@@ -57,7 +68,6 @@ def get_problem(problem_id: int):
 def get_problem(mentorie_id: int):
     problems = get_problem_by_mentorie_id(mentorie_id)
     if problems:
-        # raise HTTPException(status_code=404, detail="Problema no encontrado")
         return problems
 
 @router.get("/get/lang/{lang}", response_model=List[ProblemWithExamples])
@@ -66,3 +76,7 @@ def get_problems_by_language(lang: str):
     if not problems:
         raise HTTPException(status_code=404, detail="Problemas no encontrados")
     return problems
+
+@router.get("/mentory/{mentory_id}/student/{student_id}/problems")
+def get_mentory_problems(mentory_id: int, student_id: int):
+    return get_problems_by_mentory_and_student(mentory_id, student_id)

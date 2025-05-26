@@ -57,6 +57,7 @@ def get_all_mentories(student_id: int):
 
 def get_mentories_by_student_id(student_id: int):
     with Session(engine) as session:
+        # Obtener todas las mentorías donde el estudiante está inscrito
         mentories = session.exec(
             select(Mentory)
             .join(MentoryStudentLink, Mentory.id == MentoryStudentLink.mentory_id)
@@ -66,32 +67,46 @@ def get_mentories_by_student_id(student_id: int):
         mentorie_list = []
 
         for mentory in mentories:
+            # Obtener los datos del mentor
             mentor = session.exec(
                 select(Mentor).where(Mentor.id == mentory.id_mentor)
             ).first()
 
-            mentorie_list.append({
-                "id": mentory.id,
-                "title": mentory.title,
-                "description": mentory.description,
-                "image": mentory.image,
-                "price": mentory.price,
-                "duration": mentory.duration,
-                "max_students": mentory.max_students,
-                "id_mentor": mentory.id_mentor,
-                "mentor": (
-                    {
-                        "id": mentor.id,
-                        "name": mentor.name,
-                        "surname": mentor.surname,
-                        "profile_picture": mentor.profile_picture,
-                        "specialization": mentor.specialization,
-                    } if mentor else None
+            # Obtener el vínculo del estudiante con la mentoría
+            link = session.exec(
+                select(MentoryStudentLink).where(
+                    (MentoryStudentLink.student_id == student_id)
+                    & (MentoryStudentLink.mentory_id == mentory.id)
                 )
-            })
+            ).first()
+
+            mentorie_list.append(
+                {
+                    "id": mentory.id,
+                    "title": mentory.title,
+                    "description": mentory.description,
+                    "image": mentory.image,
+                    "price": mentory.price,
+                    "duration": mentory.duration,
+                    "max_students": mentory.max_students,
+                    "id_mentor": mentory.id_mentor,
+                    "mentor": (
+                        {
+                            "id": mentor.id,
+                            "name": mentor.name,
+                            "surname": mentor.surname,
+                            "profile_picture": mentor.profile_picture,
+                            "specialization": mentor.specialization,
+                        }
+                        if mentor
+                        else None
+                    ),
+                    "progress": link.progress if link else 0,
+                    "status": link.status if link else "pendiente",
+                }
+            )
 
         return mentorie_list
-
 
 
 def register_in_mentory(mentory_id: int, student_id: int):
@@ -120,12 +135,55 @@ def get_mentories_by_id(mentor_id: int):
         return mentories
 
 
-def get_mentorie_by_id(mentory_id: int):
+def get_mentorie_by_id_mentory(mentory_id: int):
+    with Session(engine) as session:
+        mentorie = session.exec(select(Mentory).where(Mentory.id == mentory_id)).first()
+        if not mentorie:
+            return {"message": "No hay mentoria registrada con esa ID"}
+        return mentorie
+
+
+def get_mentorie_by_id(mentory_id: int, student_id: int):
     with Session(engine) as session:
         mentorie = session.get(Mentory, mentory_id)
+
         if not mentorie:
-            return {"message": "Mentoria no encontrado"}
-        return mentorie
+            return {"message": "Mentoría no encontrada"}
+
+        mentor = session.exec(
+            select(Mentor).where(Mentor.id == mentorie.id_mentor)
+        ).first()
+
+        link = session.exec(
+            select(MentoryStudentLink).where(
+                (MentoryStudentLink.student_id == student_id)
+                & (MentoryStudentLink.mentory_id == mentory_id)
+            )
+        ).first()
+
+        return {
+            "id": mentorie.id,
+            "title": mentorie.title,
+            "description": mentorie.description,
+            "image": mentorie.image,
+            "price": mentorie.price,
+            "duration": mentorie.duration,
+            "max_students": mentorie.max_students,
+            "id_mentor": mentorie.id_mentor,
+            "mentor": (
+                {
+                    "id": mentor.id,
+                    "name": mentor.name,
+                    "surname": mentor.surname,
+                    "profile_picture": mentor.profile_picture,
+                    "specialization": mentor.specialization,
+                }
+                if mentor
+                else None
+            ),
+            "progress": link.progress if link else 0,
+            "status": link.status if link else "pendiente",
+        }
 
 
 async def create_mentorie_service(
