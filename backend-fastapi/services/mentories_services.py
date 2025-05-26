@@ -1,18 +1,113 @@
 from sqlmodel import Session, select
 from core.database import engine
-from models.mentor_model import Mentory
+from models.mentor_model import Mentory, Mentor
+from models.student_model import Student
+from models.mentory_students_link import MentoryStudentLink
 from fastapi import UploadFile
 import cloudinary
 import cloudinary.uploader
 
 
-def get_all_mentories():
+def get_all_mentories(student_id: int):
     with Session(engine) as session:
-        mentories = session.exec(select(Mentory))
+        mentories = session.exec(select(Mentory)).all()
         mentorie_list = []
-        for mentorie in mentories:
-            mentorie_list.append(mentorie)
+
+        for mentory in mentories:
+            mentor = session.exec(
+                select(Mentor).where(Mentor.id == mentory.id_mentor)
+            ).first()
+
+            is_enrolled = (
+                session.exec(
+                    select(MentoryStudentLink).where(
+                        (MentoryStudentLink.student_id == student_id)
+                        & (MentoryStudentLink.mentory_id == mentory.id)
+                    )
+                ).first()
+                is not None
+            )
+
+            mentorie_list.append(
+                {
+                    "id": mentory.id,
+                    "title": mentory.title,
+                    "description": mentory.description,
+                    "image": mentory.image,
+                    "price": mentory.price,
+                    "duration": mentory.duration,
+                    "max_students": mentory.max_students,
+                    "id_mentor": mentory.id_mentor,
+                    "is_enrolled": is_enrolled,
+                    "mentor": (
+                        {
+                            "id": mentor.id,
+                            "name": mentor.name,
+                            "surname": mentor.surname,
+                            "profile_picture": mentor.profile_picture,
+                            "specialization": mentor.specialization,
+                        }
+                        if mentor
+                        else None
+                    ),
+                }
+            )
+
         return mentorie_list
+
+def get_mentories_by_student_id(student_id: int):
+    with Session(engine) as session:
+        mentories = session.exec(
+            select(Mentory)
+            .join(MentoryStudentLink, Mentory.id == MentoryStudentLink.mentory_id)
+            .where(MentoryStudentLink.student_id == student_id)
+        ).all()
+
+        mentorie_list = []
+
+        for mentory in mentories:
+            mentor = session.exec(
+                select(Mentor).where(Mentor.id == mentory.id_mentor)
+            ).first()
+
+            mentorie_list.append({
+                "id": mentory.id,
+                "title": mentory.title,
+                "description": mentory.description,
+                "image": mentory.image,
+                "price": mentory.price,
+                "duration": mentory.duration,
+                "max_students": mentory.max_students,
+                "id_mentor": mentory.id_mentor,
+                "mentor": (
+                    {
+                        "id": mentor.id,
+                        "name": mentor.name,
+                        "surname": mentor.surname,
+                        "profile_picture": mentor.profile_picture,
+                        "specialization": mentor.specialization,
+                    } if mentor else None
+                )
+            })
+
+        return mentorie_list
+
+
+
+def register_in_mentory(mentory_id: int, student_id: int):
+    with Session(engine) as session:
+        enroll = MentoryStudentLink(
+            mentory_id=mentory_id,
+            student_id=student_id,
+            progress=0,
+            status="not_started",
+        )
+        session.add(enroll)
+        session.flush()
+
+        session.commit()
+
+        return {"message": "Te inscribiste correctamente"}
 
 
 def get_mentories_by_id(mentor_id: int):

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import Optional
+from schemas.mentorie_scheme import MentorieStudentLink
 from services.mentories_services import (
     create_mentorie_service,
     update_mentorie_service,
@@ -7,9 +8,21 @@ from services.mentories_services import (
     get_mentories_by_id,
     get_mentorie_by_id,
     get_all_mentories,
+    register_in_mentory,
+    get_mentories_by_student_id,
 )
 
 router = APIRouter(prefix="/api/mentories", tags=["Mentories"])
+
+
+@router.get("/{student_id}")
+def get_student_mentories(student_id: int):
+    return get_mentories_by_student_id(student_id)
+
+
+@router.post("/enroll")
+def enroll_student(data: MentorieStudentLink):
+    return register_in_mentory(data.mentory_id, data.student_id)
 
 
 @router.post("/create")
@@ -68,10 +81,12 @@ def delete_mentory(mentory_id: int):
 def get_mentories(mentor_id: int):
     return get_mentories_by_id(mentor_id)
 
+
 @router.get("/get/mentorie/{mentory_id}")
 def get_mentory(mentory_id: int):
     return get_mentorie_by_id(mentory_id)
 
-@router.get("/all")
-def get_all():
-    return get_all_mentories()
+
+@router.get("/all/{student_id}")
+def get_all(student_id: int):
+    return get_all_mentories(student_id)

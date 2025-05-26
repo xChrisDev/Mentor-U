@@ -1,11 +1,20 @@
 import axios from "axios";
 
-export const getAllMentories = async () => {
+export const getAllMentories = async (student_id) => {
   try {
-    const response = await axios.get("http://127.0.0.1:8000/api/mentories/all");
+    const response = await axios.get(`http://127.0.0.1:8000/api/mentories/all/${student_id}`);
     return response.data;
   } catch (error) {
     return { message: "Error al tratar obtener las mentorias" };
+  }
+};
+
+export const getAllMentoriesByStudent = async (student_id) => {
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/api/mentories/${student_id}`);
+    return response.data;
+  } catch (error) {
+    return { message: "Error al tratar obtener las mentorias del estudiante" };
   }
 };
 
@@ -41,6 +50,18 @@ export const postMentorie = async (data) => {
     return response.data;
   } catch (error) {
     return { message: "Error inesperado al tratar agregar mentoria" };
+  }
+};
+
+export const enrollMentorie = async (data) => {
+  try {
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/mentories/enroll",
+      data
+    );
+    return response.data;
+  } catch (error) {
+    return { message: "Error inesperado al inscribirse" };
   }
 };
 

@@ -9,4 +9,6 @@ class MentoryStudentLink(SQLModel, table=True):
     student_id: Optional[int] = Field(
         default=None, foreign_key="students.id", primary_key=True
     )
-    registered_students: int = Field(nullable=False)
+    progress: int = Field(index=True, nullable=False)
+    status: str = Field(index=True, nullable=False)
+    
