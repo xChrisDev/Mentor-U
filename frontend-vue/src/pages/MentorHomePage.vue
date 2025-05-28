@@ -16,6 +16,8 @@ const { clearUser, fetchUser, logout } = useAuth()
 const toast = useToast()
 const router = useRouter()
 const mentories = ref([])
+const problems = ref([])
+const students = ref([])
 const techs = ref([])
 const mentor = ref(null)
 const studentCount = ref(0)
@@ -44,7 +46,11 @@ const fetchMentories = async () => {
   mentories.value = res
 }
 
-const fetchMentorTechs = async () => { 
+const fetchMentorAndStudentsProblems = async () => {
+
+}
+
+const fetchMentorTechs = async () => {
   const res = await getTechsByID(mentor.value.id)
   techs.value = res
 }
@@ -119,6 +125,22 @@ onMounted(async () => {
         <div class="flex items-center">
           <span class="material-symbols-rounded text-3xl mr-2" style="font-size: 2em;">menu_book</span>
           <h3 class="text-2xl font-bold">Tus mentorías</h3>
+        </div>
+        <div v-if="mentories.length" class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+          <MentorieCard v-for="mentorie in mentories" :key="mentorie.id" :mentoria="mentorie"
+            @click="handleMentorieDetails(mentorie.id)" />
+        </div>
+        <div v-else class="flex justify-center text-md text-black mt-4">
+          <NeoContainer bg="bg-white shadow-none" class="w-fit mb-2">
+            Aún no has creado ninguna mentoría, comienza a compartir tu conocimiento! :D
+          </NeoContainer>
+        </div>
+      </NeoContainer>
+
+      <NeoContainer bg="bg-[#FFF6D1]" class="p-6 mt-8 flex flex-col w-full">
+        <div class="flex items-center">
+          <span class="material-symbols-rounded text-3xl mr-2" style="font-size: 2em;">assignment_turned_in</span>
+          <h3 class="text-2xl font-bold">Tus revisiones</h3>
         </div>
         <div v-if="mentories.length" class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
           <MentorieCard v-for="mentorie in mentories" :key="mentorie.id" :mentoria="mentorie"

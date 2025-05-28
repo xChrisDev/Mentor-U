@@ -111,17 +111,39 @@ def create_problem(topic: str, lang: str, level: str, id_mentor: int, id_mentori
                 print("Error al crear el problema:", str(e))
                 return None
 
-def get_problem_by_id(problem_id: int):
+def get_problem_by_id(problem_id: int, student_id: int):
     with Session(engine) as session:
-        statement = (
+        # Obtener el problema con sus ejemplos
+        problem_stmt = (
             select(Problem)
             .where(Problem.id == problem_id)
             .options(selectinload(Problem.examples))
         )
-        problem = session.exec(statement).first()
+        problem = session.exec(problem_stmt).first()
         if not problem:
             return None
-        return problem
+
+        # Obtener el status del estudiante para este problema
+        status_stmt = (
+            select(StudentProblemLink.status)
+            .where(
+                StudentProblemLink.problem_id == problem_id,
+                StudentProblemLink.student_id == student_id
+            )
+        )
+        status = session.exec(status_stmt).first()
+
+        # Convertir los ejemplos a dicts
+        examples_data = [example.dict() for example in problem.examples]
+
+        # Construir el diccionario final combinando todo
+        problem_data = problem.dict()
+        problem_data["examples"] = examples_data
+        problem_data["status"] = status  # Puede ser None si no existe relación
+
+        return problem_data
+
+
 
 def get_problems_by_mentory_and_student(mentory_id: int, student_id: int):
     with Session(engine) as session:
@@ -146,7 +168,7 @@ def get_problems_by_mentory_and_student(mentory_id: int, student_id: int):
                 link = StudentProblemLink(
                     problem_id=problem.id,
                     student_id=student_id,
-                    status="pendiente"
+                    status="pending"
                 )
                 session.add(link)
                 session.commit()
@@ -201,7 +223,7 @@ def update_mentory_progress(student_id: int, mentory_id: int):
                 select(StudentProblemLink).where(
                     (StudentProblemLink.problem_id == problem.id) &
                     (StudentProblemLink.student_id == student_id) &
-                    (StudentProblemLink.status == "completado")
+                    (StudentProblemLink.status == "completed")
                 )
             ).first()
 

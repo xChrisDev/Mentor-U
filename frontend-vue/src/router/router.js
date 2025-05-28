@@ -8,6 +8,7 @@ import ErrorPage from "../pages/ErrorPage.vue";
 import { useAuth } from "../composables/useAuth";
 import MentorieDetailPage from "../pages/MentorieDetailPage.vue";
 import MentorieEnrollPage from "../pages/MentorieEnrollPage.vue";
+import ProblemDetailPage from "../pages/ProblemDetailPage.vue";
 
 const routes = [
   { path: "/", component: LandingPage },
@@ -35,6 +36,12 @@ const routes = [
   {
     path: "/home/student/:id/mentories/:id_mentorie",
     component: MentorieEnrollPage,
+    props: true,
+    meta: { requiresAuth: true, role: "student" },
+  },
+  {
+    path: "/home/student/:id/mentories/:id_mentorie/problems/:id_problem",
+    component: ProblemDetailPage,
     props: true,
     meta: { requiresAuth: true, role: "student" },
   },

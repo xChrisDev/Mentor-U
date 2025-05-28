@@ -10,6 +10,7 @@ from routers import (
     student_controller,
     mentories_controller,
     chat_controller,
+    solutions_controller
 )
 
 app = FastAPI()
@@ -31,6 +32,7 @@ init_cloudinary()
 
 app.include_router(user_controller.router)
 app.include_router(problem_controller.router)
+app.include_router(solutions_controller.router)
 app.include_router(mentor_controller.router)
 app.include_router(student_controller.router)
 app.include_router(mentories_controller.router)

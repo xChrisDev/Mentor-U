@@ -80,8 +80,8 @@
                             @click="problemFilter = 'all'" />
                         <NeoButton :bg="problemFilter === 'completed' ? '#96FEAD' : '#F5F5F5'" text="Completados"
                             @click="problemFilter = 'completed'" />
-                        <NeoButton :bg="problemFilter === 'in_progress' ? '#96FEAD' : '#F5F5F5'" text="Pendientes"
-                            @click="problemFilter = 'in_progress'" />
+                        <NeoButton :bg="problemFilter === 'pending' ? '#96FEAD' : '#F5F5F5'" text="Pendientes"
+                            @click="problemFilter = 'pending'" />
                         <NeoButton :bg="problemFilter === 'in_revision' ? '#96FEAD' : '#F5F5F5'" text="En revisión"
                             @click="problemFilter = 'in_revision'" />
                     </div>
@@ -95,7 +95,7 @@
                 <div v-else-if="filteredProblems?.length || 0" class="space-y-4">
                     <div v-for="(problem, index) in filteredProblems" :key="problem.id"
                         class="bg-white border-2 border-black rounded-lg p-4 hover:scale-[101%] transition-all cursor-pointer"
-                        @click="openProblem(problem)">
+                        @click="openProblem(problem.id)">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-4 flex-1">
                                 <div class="flex-1">
@@ -112,9 +112,8 @@
                             </div>
 
                             <div class="flex items-center gap-3">
-                                <NeoTab :text="problem.status == 'completado' ? 'Completado' : 'Pendiente'"
-                                    :bg="problem.status == 'completado' ? 'bg-[#96FEAD]' : 'bg-[#FFADAD]'"
-                                    :icon="problem.status == 'completado' ? 'check_circle' : 'radio_button_unchecked'" />
+                                <NeoTab :text="getStatusTabText(problem.status)" :bg="getStatusTabColor(problem.status)"
+                                    :icon="getStatusTabIcon(problem.status)" />
                                 <span class="material-symbols-rounded text-2xl">arrow_forward_ios</span>
                             </div>
                         </div>
@@ -140,9 +139,11 @@ import NeoTab from '../components/NeoTab.vue';
 import { getMentorieDetailByID } from '../services/mentorieService';
 import { useAuth } from '../composables/useAuth';
 import { getMentoryProblemsByStudent, updateProgress } from '../services/problemService';
+import { useRouter } from 'vue-router';
 const { fetchUser } = useAuth();
 const toast = useToast();
 
+const router = useRouter()
 const mentorie = ref(null);
 const student = ref(null);
 const problems = ref([]);
@@ -154,6 +155,10 @@ const props = defineProps({
     id: String,
     id_mentorie: String
 });
+
+const openProblem = (id) => {
+    router.push(`/home/student/${props.id}/mentories/${props.id_mentorie}/problems/${id}`)
+}
 
 const fetchMentorieDetail = async () => {
     try {
@@ -182,16 +187,42 @@ const fetchProblems = async () => {
 // Computed properties
 const filteredProblems = computed(() => {
     if (problemFilter.value === 'completed') {
-        return problems.value.filter(p => p.status == 'completado');
-    } else if (problemFilter.value === 'in_progress') {
-        return problems.value.filter(p => p.status == 'pendiente');
+        return problems.value.filter(p => p.status == 'completed');
+    } else if (problemFilter.value === 'pending') {
+        return problems.value.filter(p => p.status == 'pending');
     } else if (problemFilter.value === 'in_revision') {
-        return problems.value.filter(p => p.status == 'en_revision');
+        return problems.value.filter(p => p.status == 'in_revision');
     }
     return problems.value;
 });
 
 // Helper functions
+const getStatusTabText = (status) => {
+    switch (status) {
+        case 'completed': return 'Completado';
+        case 'pending': return 'Pendiente';
+        case 'in_revision': return 'En Revisión';
+        default: return 'Desconocido';
+    }
+};
+
+const getStatusTabColor = (status) => {
+    switch (status) {
+        case 'completed': return 'bg-[#96FEAD]';
+        case 'pending': return 'bg-[#FFADAD]';
+        case 'in_revision': return 'bg-[#FFD6A5]';
+        default: return 'bg-gray-300';
+    }
+};
+
+const getStatusTabIcon = (status) => {
+    switch (status) {
+        case 'completed': return 'check_circle';
+        case 'pending': return 'radio_button_unchecked';
+        case 'in_revision': return 'hourglass_empty';
+        default: return 'help';
+    }
+};
 const getProgressColor = (progress) => {
     if (progress >= 80) return 'bg-[#96FEAD]'
     if (progress >= 50) return 'bg-[#FFD6A5]'
@@ -259,6 +290,8 @@ const getDifficultyText = (difficulty) => {
 //     }
 //     problemModal.value?.close();
 // };
+
+
 
 onMounted(async () => {
     await fetchStudentData();

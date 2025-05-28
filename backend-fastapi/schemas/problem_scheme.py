@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class ProblemStatus(BaseModel):
     problem_id: int
@@ -44,3 +44,9 @@ class ProblemWithExamples(BaseModel):
 
     class Config:
         orm_mode = True
+        
+        
+class PromptRequest(BaseModel):
+    lang: str
+    code: str
+    examples: List[Example]
