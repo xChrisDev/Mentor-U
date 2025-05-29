@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 from sqlalchemy import Text, Column, ForeignKey
-
+from models.student_solution import StudentSolution
 
 class Example(SQLModel, table=True):
     __tablename__ = "examples"
@@ -51,3 +51,4 @@ class Problem(SQLModel, table=True):
     )
 
     examples: List[Example] = Relationship(back_populates="problem")
+    solutions: List["StudentSolution"] = Relationship(back_populates="problem")

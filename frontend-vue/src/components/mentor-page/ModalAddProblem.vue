@@ -57,6 +57,11 @@ const handleConfirm = async () => {
             emit('update')
             modalRef.value?.close();
             isLoading.value = false;
+            form.value = {
+                topic: '',
+                level: '',
+                lang: ''
+            }
         } else {
             toast.error(response.message, {
                 toastClassName: "my-custom-toast-class",
@@ -125,7 +130,7 @@ const handleConfirm = async () => {
                     </div>
                 </div>
             </form>
-            
+
             <div v-if="isLoading" class="flex justify-center mt-4">
                 <div class="loader" data-aos="zoom-in" data-aos-delay="100"></div>
             </div>

@@ -63,6 +63,19 @@ export const updateProblemStatus = async (id, data) => {
   }
 };
 
+export const postStudentSolution = async (data) => {
+  try {
+    const response = await axios.post(
+      `http://127.0.0.1:8000/api/problems/student-solutions`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return { message: "Error inesperado al agregar solucion" };
+  }
+};
+
 export async function getMentoryProblemsByStudent(mentoryId, studentId) {
   try {
     const response = await axios.get(

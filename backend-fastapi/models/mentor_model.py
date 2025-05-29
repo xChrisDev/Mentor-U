@@ -5,6 +5,7 @@ from sqlalchemy import Enum as SQLAlchemyEnum
 from models.enums.constants import GenreEnum
 from models.mentor_technology_link import MentorTechnologyLink
 from models.mentory_students_link import MentoryStudentLink
+from models.student_solution import StudentSolution
 
 
 class Mentory(SQLModel, table=True):
@@ -29,6 +30,8 @@ class Mentory(SQLModel, table=True):
     students: List["Student"] = Relationship(
         back_populates="mentories", link_model=MentoryStudentLink
     )
+    
+    solutions: List["StudentSolution"] = Relationship(back_populates="mentory")
 
 
 class Mentor(SQLModel, table=True):

@@ -56,7 +56,7 @@
           <div class="loader"></div>
         </div>
 
-        <NeoContainer v-if="result" bg="bg-white" class="p-4 flex flex-col">
+        <NeoContainer v-if="result" bg="bg-white" class="p-4 flex flex-col" data-aos="fade-up" data-aos-delay="100">
           <h3 class="font-bold">Resultado</h3>
 
           <div v-if="Array.isArray(result.message.results)">
@@ -77,6 +77,22 @@
             </div>
           </div>
         </NeoContainer>
+
+        <NeoContainer bg="bg-gray-400" v-if="problem.status === 'in_revision'"
+          class="p-4 flex justify-center items-center">
+          <span class="material-symbols-rounded me-2" style="font-size: 2rem;">
+            schedule
+          </span>
+          <h3 class="font-bold text-2xl">Actualmente tu problema está en revisión por el mentor.</h3>
+        </NeoContainer>
+
+        <NeoContainer bg="bg-green-300" v-if="problem.status === 'completed'"
+          class="p-4 flex justify-center items-center">
+          <span class="material-symbols-rounded me-2" style="font-size: 2rem;">
+            check_circle
+          </span>
+          <h3 class="font-bold text-2xl">Ya has completado esté problema correctamente.</h3>
+        </NeoContainer>
       </div>
     </div>
   </div>
@@ -89,7 +105,7 @@ import NeoContainer from '../components/NeoContainer.vue';
 import NeoButton from '../components/NeoButton.vue';
 import NeoTab from '../components/NeoTab.vue';
 import MonacoEditor from '../components/MonacoEditor.vue';
-import { getProblemByID, updateProblemStatus } from '../services/problemService';
+import { getProblemByID, postStudentSolution, updateProblemStatus } from '../services/problemService';
 import { useAuth } from '../composables/useAuth';
 import { testCode } from '../services/problemService';
 import { useToast } from 'vue-toastification';
@@ -133,7 +149,7 @@ const testingCode = async () => {
     code: userCode.value,
     examples: problem.value.examples
   });
-  // console.log(res);
+  console.log(res);
   result.value = res;
 
   const passedAll = Array.isArray(res.message.results)
@@ -148,7 +164,8 @@ const testingCode = async () => {
 const submitSolution = async () => {
   try {
     const user = await fetchUser();
-    const res = await updateProblemStatus(props.id_problem, { problem_id: props.id_problem, student_id: user.data.id, status: 'in_revision' })
+    await updateProblemStatus(props.id_problem, { problem_id: props.id_problem, student_id: user.data.id, status: 'in_revision' })
+    await postStudentSolution({ problem_id: props.id_problem, student_id: user.data.id, code: userCode.value, mentorie_id: props.id_mentorie, comments: '', result: 'Correcto' })
     toast.success("Solución enviada correctamente al mentor", {
       toastClassName: "my-custom-toast-class",
     });

@@ -186,3 +186,93 @@ async def test_code_endpoint(request: PromptRequest):
     except Exception as e:
         print("Error al procesar la respuesta:", str(e))
         return {"error": "Hubo un problema al procesar la respuesta de la IA"}
+
+
+from datetime import datetime, timezone
+from sqlmodel import Session, select
+from models.student_solution import StudentSolution, StudentSolutionCreate, StudentSolutionUpdate, StudentSolutionWithDetails
+from core.database import engine
+from typing import List
+from models.mentor_model import Mentory
+
+@router.post("/student-solutions/", response_model=StudentSolution)
+def create_student_solution(solution: StudentSolutionCreate):
+    with Session(engine) as session:
+        new_solution = StudentSolution.from_orm(solution)
+        session.add(new_solution)
+        session.commit()
+        session.refresh(new_solution)
+        return new_solution
+    
+@router.put("/student-solutions/{solution_id}", response_model=StudentSolution)
+def update_student_solution(solution_id: int, solution_update: StudentSolutionUpdate):
+    with Session(engine) as session:
+        db_solution = session.get(StudentSolution, solution_id)
+        if not db_solution:
+            raise HTTPException(status_code=404, detail="Solution not found")
+        
+        for key, value in solution_update.dict(exclude_unset=True).items():
+            setattr(db_solution, key, value)
+
+        db_solution.updated_at = datetime.now(timezone.utc)
+        session.add(db_solution)
+        session.commit()
+        session.refresh(db_solution)
+        return db_solution
+
+@router.delete("/student-solutions/{solution_id}")
+def delete_student_solution(solution_id: int):
+    with Session(engine) as session:
+        db_solution = session.get(StudentSolution, solution_id)
+        if not db_solution:
+            raise HTTPException(status_code=404, detail="Solution not found")
+        
+        session.delete(db_solution)
+        session.commit()
+        return {"detail": "Solution deleted successfully"}
+    
+@router.get("/student-solutions/", response_model=List[StudentSolutionWithDetails])
+def get_solutions_by_mentor(mentor_id: int):
+    with Session(engine) as session:
+        # Paso 1: obtener todas las mentories del mentor
+        mentories = session.exec(
+            select(Mentory.id).where(Mentory.id_mentor == mentor_id)
+        ).all()
+
+        if not mentories:
+            return []
+
+        # Paso 2: obtener soluciones relacionadas con esas mentories
+        solutions = session.exec(
+            select(StudentSolution)
+            .where(StudentSolution.mentorie_id.in_(mentories))
+        ).all()
+
+        # Paso 3: construir respuestas con detalles
+        results = []
+        for ss in solutions:
+            result = StudentSolutionWithDetails(
+                id=ss.id,
+                problem_id=ss.problem_id,
+                student_id=ss.student_id,
+                mentorie_id=ss.mentorie_id,
+                code=ss.code,
+                comments=ss.comments,
+                result=ss.result,
+                created_at=ss.created_at,
+                updated_at=ss.updated_at,
+
+                problem_title=ss.problem.title,
+                problem_description=ss.problem.description,
+                problem_difficulty=ss.problem.difficulty,
+                problem_topic=ss.problem.topic,
+
+                student_name=ss.student.name,
+                student_surname=ss.student.surname,
+
+                mentorie_title=ss.mentorie.title,
+                mentorie_description=ss.mentorie.description,
+            )
+            results.append(result)
+
+        return results

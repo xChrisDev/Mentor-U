@@ -2,9 +2,12 @@ from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional
 from datetime import datetime, timezone
 from sqlalchemy import Text, Column, ForeignKey
-from models.problem_model import Problem
-from models.student_model import Student
-from models.mentor_model import Mentory
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from models.problem_model import Problem
+    from models.student_model import Student
+    from models.mentor_model import Mentory
 
 
 class StudentSolution(SQLModel, table=True):
@@ -35,7 +38,7 @@ class StudentSolution(SQLModel, table=True):
     
     code: str = Field(sa_column=Column(Text))
     comments: Optional[str] = Field(sa_column=Column(Text), default="")
-    result: str = Field(nullable=False)  # "passed", "failed", "pending", etc.
+    result: str = Field(nullable=False) 
     
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -43,7 +46,7 @@ class StudentSolution(SQLModel, table=True):
     # Relaciones
     problem: Optional["Problem"] = Relationship()
     student: Optional["Student"] = Relationship()
-    mentorie: Optional["Mentory"] = Relationship()
+    mentory: Optional["Mentory"] = Relationship()
 
 
 # Modelo para respuesta con información completa

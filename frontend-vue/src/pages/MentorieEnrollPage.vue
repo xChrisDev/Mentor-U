@@ -92,7 +92,7 @@
                     <div class="loader"></div>
                 </div>
 
-                <div v-else-if="filteredProblems?.length || 0" class="space-y-4">
+                <div v-else-if="filteredProblems?.length || 0" class="space-y-4" data-aos="fade-up" data-aos-delay="100">
                     <div v-for="(problem, index) in filteredProblems" :key="problem.id"
                         class="bg-white border-2 border-black rounded-lg p-4 hover:scale-[101%] transition-all cursor-pointer"
                         @click="openProblem(problem.id)">
