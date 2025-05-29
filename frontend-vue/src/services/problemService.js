@@ -25,6 +25,30 @@ export const getProblemsByMentorID = async (id) => {
   }
 };
 
+export const getSolutionsByMentorID = async (id) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/api/problems/student-solutions/?mentor_id=${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return { message: "Error inesperado al obtener problemas" };
+  }
+};
+
+export const getSolutionByID = async (id) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/api/problems/student-solutions/get/?solution_id=${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return { message: "Error inesperado al obtener problemas" };
+  }
+};
+
 export const getProblemByID = async (id_problem, id_student) => {
   try {
     const response = await axios.get(

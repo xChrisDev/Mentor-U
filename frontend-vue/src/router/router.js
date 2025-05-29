@@ -9,6 +9,7 @@ import { useAuth } from "../composables/useAuth";
 import MentorieDetailPage from "../pages/MentorieDetailPage.vue";
 import MentorieEnrollPage from "../pages/MentorieEnrollPage.vue";
 import ProblemDetailPage from "../pages/ProblemDetailPage.vue";
+import MentorRevisionPage from "../pages/MentorRevisionPage.vue";
 
 const routes = [
   { path: "/", component: LandingPage },
@@ -44,6 +45,12 @@ const routes = [
     component: ProblemDetailPage,
     props: true,
     meta: { requiresAuth: true, role: "student" },
+  },
+  {
+    path: "/home/mentor/:id/mentories/:id_mentorie/solutions/:id_solution",
+    component: MentorRevisionPage,
+    props: true,
+    meta: { requiresAuth: true, role: "mentor" },
   },
 ];
 

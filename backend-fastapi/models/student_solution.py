@@ -68,6 +68,7 @@ class StudentSolutionWithDetails(SQLModel):
     
     student_name: str
     student_surname: str
+    student_photo: str
     
     mentorie_title: str
     mentorie_description: str

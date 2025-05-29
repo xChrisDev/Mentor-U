@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import NeoButton from '../components/NeoButton.vue';
 import NeoContainer from '../components/NeoContainer.vue';
 import NeoTab from '../components/NeoTab.vue';
@@ -11,16 +11,20 @@ import { getTechsByID } from '../services/mentorService';
 import { getMentorieByID, getMentorStudentCount } from '../services/mentorieService';
 import ModalAddMentorie from '../components/mentor-page/ModalAddMentorie.vue';
 import ModalSettingsUser from '../components/mentor-page/ModalSettingsUser.vue';
+import { getSolutionsByMentorID } from '../services/problemService';
+import SolutionCard from '../components/mentor-page/SolutionCard.vue';
 
 const { clearUser, fetchUser, logout } = useAuth()
 const toast = useToast()
 const router = useRouter()
 const mentories = ref([])
-const problems = ref([])
-const students = ref([])
+const solutions = ref([])
 const techs = ref([])
 const mentor = ref(null)
 const studentCount = ref(0)
+
+const mentorieSearch = ref('')
+const solutionFilter = ref('all')
 
 const props = defineProps({
   id: String
@@ -47,7 +51,8 @@ const fetchMentories = async () => {
 }
 
 const fetchMentorAndStudentsProblems = async () => {
-
+  const res = await getSolutionsByMentorID(mentor.value.id)
+  solutions.value = res
 }
 
 const fetchMentorTechs = async () => {
@@ -59,14 +64,28 @@ const handleMentorieDetails = (mentorie_id) => {
   router.push(`/home/mentor/${mentor.value.user_id}/mentories/${mentorie_id}`);
 }
 
+const handleProblemDetails = (solution_id, mentorie_id) => {
+  router.push(`/home/mentor/${mentor.value.user_id}/mentories/${mentorie_id}/solutions/${solution_id}`);
+}
+
+const filteredMentories = computed(() => {
+  return mentories.value.filter(m =>
+    m.title.toLowerCase().includes(mentorieSearch.value.toLowerCase())
+  )
+})
+
+const filteredSolutions = computed(() => {
+  if (solutionFilter.value === 'all') return solutions.value
+  return solutions.value.filter(s => s.result === solutionFilter.value)
+})
+
 onMounted(async () => {
   clearUser();
   await fetchMentorData();
   await fetchMentories();
   await fetchMentorTechs();
-  // console.log(mentor.value);
+  await fetchMentorAndStudentsProblems();
 });
-
 </script>
 
 <template>
@@ -122,39 +141,49 @@ onMounted(async () => {
       </div>
 
       <NeoContainer bg="bg-[#FFF6D1]" class="p-6 mt-8 flex flex-col w-full">
-        <div class="flex items-center">
-          <span class="material-symbols-rounded text-3xl mr-2" style="font-size: 2em;">menu_book</span>
-          <h3 class="text-2xl font-bold">Tus mentorías</h3>
+        <div class="flex justify-between items-center mb-4 gap-4">
+          <div class="flex items-center">
+            <span class="material-symbols-rounded me-2" style="font-size: 2em;">menu_book</span>
+            <h3 class="text-2xl font-bold">Tus mentorías</h3>
+          </div>
+          <input type="text" v-model="mentorieSearch" placeholder="Buscar por título..."
+            class="border-2 bg-white border-black px-4 py-2 rounded-md w-96" />
         </div>
-        <div v-if="mentories.length" class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
-          <MentorieCard v-for="mentorie in mentories" :key="mentorie.id" :mentoria="mentorie"
+
+        <div v-if="filteredMentories.length" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <MentorieCard v-for="mentorie in filteredMentories" :key="mentorie.id" :mentoria="mentorie"
             @click="handleMentorieDetails(mentorie.id)" />
         </div>
         <div v-else class="flex justify-center text-md text-black mt-4">
           <NeoContainer bg="bg-white shadow-none" class="w-fit mb-2">
-            Aún no has creado ninguna mentoría, comienza a compartir tu conocimiento! :D
+            No se encontraron mentorías con ese título.
           </NeoContainer>
         </div>
       </NeoContainer>
 
       <NeoContainer bg="bg-[#FFF6D1]" class="p-6 mt-8 flex flex-col w-full">
-        <div class="flex items-center">
-          <span class="material-symbols-rounded text-3xl mr-2" style="font-size: 2em;">assignment_turned_in</span>
-          <h3 class="text-2xl font-bold">Tus revisiones</h3>
+        <div class="flex items-center justify-between gap-2 mb-4">
+          <div class="flex gap-2">
+            <span class="material-symbols-rounded text-3xl" style="font-size: 2em;">assignment_turned_in</span>
+            <h3 class="text-2xl font-bold">Tus revisiones</h3>
+          </div>
+          <div class="flex gap-2">
+            <NeoTab class="hover:scale-105 transition-all cursor-pointer" :bg="solutionFilter === 'all' ? 'bg-green-300' : 'bg-white'" text="Todas" :active="solutionFilter === 'all'" @click="solutionFilter = 'all'" />
+            <NeoTab class="hover:scale-105 transition-all cursor-pointer" :bg="solutionFilter === 'accepted' ? 'bg-green-300' : 'bg-white'" text="Aceptadas" :active="solutionFilter === 'accepted'" @click="solutionFilter = 'accepted'" />
+            <NeoTab class="hover:scale-105 transition-all cursor-pointer" :bg="solutionFilter === 'pending' ? 'bg-green-300' : 'bg-white'" text="Pendientes" :active="solutionFilter === 'pending'" @click="solutionFilter = 'pending'" />
+            <NeoTab class="hover:scale-105 transition-all cursor-pointer" :bg="solutionFilter === 'rejected' ? 'bg-green-300' : 'bg-white'" text="Devueltas" :active="solutionFilter === 'rejected'" @click="solutionFilter = 'rejected'" />
+          </div>
         </div>
-        <div v-if="mentories.length" class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
-          <MentorieCard v-for="mentorie in mentories" :key="mentorie.id" :mentoria="mentorie"
-            @click="handleMentorieDetails(mentorie.id)" />
+        <div v-if="filteredSolutions.length" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <SolutionCard v-for="solution in filteredSolutions" :key="solution.id" :data="solution"
+            @click="handleProblemDetails(solution.id, solution.mentorie_id)" />
         </div>
         <div v-else class="flex justify-center text-md text-black mt-4">
           <NeoContainer bg="bg-white shadow-none" class="w-fit mb-2">
-            Aún no has creado ninguna mentoría, comienza a compartir tu conocimiento! :D
+            No hay soluciones con ese estado.
           </NeoContainer>
         </div>
       </NeoContainer>
-
-
     </div>
   </div>
-
 </template>

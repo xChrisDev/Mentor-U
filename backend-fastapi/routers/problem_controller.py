@@ -230,7 +230,46 @@ def delete_student_solution(solution_id: int):
         session.delete(db_solution)
         session.commit()
         return {"detail": "Solution deleted successfully"}
-    
+
+@router.get("/student-solutions/get/", response_model=StudentSolutionWithDetails)
+def get_solution_by_id(solution_id: int):
+    with Session(engine) as session:
+        # Paso 1: obtener la solución
+        solution = session.exec(
+            select(StudentSolution).where(StudentSolution.id == solution_id)
+        ).first()
+
+        if not solution:
+            return None
+
+        # Paso 2: construir la respuesta detallada
+        result = StudentSolutionWithDetails(
+            id=solution.id,
+            problem_id=solution.problem_id,
+            student_id=solution.student_id,
+            mentorie_id=solution.mentorie_id,
+            code=solution.code,
+            comments=solution.comments,
+            result=solution.result,
+            created_at=solution.created_at,
+            updated_at=solution.updated_at,
+
+            problem_title=solution.problem.title,
+            problem_description=solution.problem.description,
+            problem_difficulty=solution.problem.difficulty,
+            problem_topic=solution.problem.topic,
+
+            student_name=solution.student.name,
+            student_surname=solution.student.surname,
+            student_photo=solution.student.profile_picture,
+
+            mentorie_title=solution.mentory.title,
+            mentorie_description=solution.mentory.description,
+        )
+
+        return result
+
+            
 @router.get("/student-solutions/", response_model=List[StudentSolutionWithDetails])
 def get_solutions_by_mentor(mentor_id: int):
     with Session(engine) as session:
@@ -269,9 +308,10 @@ def get_solutions_by_mentor(mentor_id: int):
 
                 student_name=ss.student.name,
                 student_surname=ss.student.surname,
+                student_photo=ss.student.profile_picture,
 
-                mentorie_title=ss.mentorie.title,
-                mentorie_description=ss.mentorie.description,
+                mentorie_title=ss.mentory.title,
+                mentorie_description=ss.mentory.description,
             )
             results.append(result)
 

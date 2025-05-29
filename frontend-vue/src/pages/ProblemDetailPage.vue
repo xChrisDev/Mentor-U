@@ -165,7 +165,7 @@ const submitSolution = async () => {
   try {
     const user = await fetchUser();
     await updateProblemStatus(props.id_problem, { problem_id: props.id_problem, student_id: user.data.id, status: 'in_revision' })
-    await postStudentSolution({ problem_id: props.id_problem, student_id: user.data.id, code: userCode.value, mentorie_id: props.id_mentorie, comments: '', result: 'Correcto' })
+    await postStudentSolution({ problem_id: props.id_problem, student_id: user.data.id, code: userCode.value, mentorie_id: props.id_mentorie, comments: '', result: 'pending' })
     toast.success("Solución enviada correctamente al mentor", {
       toastClassName: "my-custom-toast-class",
     });

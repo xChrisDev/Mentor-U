@@ -1,73 +1,86 @@
 <template>
-    <div v-if="problem" class="mx-auto flex justify-center py-10" data-aos="zoom-in" data-aos-delay="100">
+    <div v-if="submission" class="mx-auto flex justify-center py-10" data-aos="zoom-in" data-aos-delay="100">
         <div class="w-[90%] lg:w-[85%] grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <div class="lg:col-span-1 space-y-4">
-                <NeoContainer bg="bg-white" class="flex flex-col p-6 space-y-4">
-                    <div>
-                        <h1 class="text-2xl font-bold">{{ problem.title }}</h1>
+                <div class="flex flex-col space-y-4">
+
+                    <NeoContainer bg="bg-white" class="flex items-center gap-4">
+                        <img :src="submission.student_photo" alt="Foto del estudiante"
+                            class="w-14 h-14 rounded-full border-2 border-black" />
+                        <div>
+                            <h2 class="text-lg font-bold">{{ submission.student_name }} {{ submission.student_surname }}
+                            </h2>
+                            <p class="text-sm text-gray-600">ID estudiante: {{ submission.student_id }}</p>
+                        </div>
+                    </NeoContainer>
+
+                    <NeoContainer bg="bg-[#F1E9FF]" class="flex flex-col gap-2 p-4">
+                        <p class="text-xl"><strong>{{ submission.mentorie_title }}</strong></p>
+                        <p class="font-medium text-gray-700">{{ submission.mentorie_description }}</p>
+                    </NeoContainer>
+
+                    <NeoContainer bg="bg-[#FFF6D1]" class="flex flex-col p-4">
+                        <h1 class="text-xl font-bold">{{ submission.problem_title }}</h1>
                         <div class="flex gap-2 my-2">
-                            <NeoTab :text="getDifficultyText(problem.difficulty)"
-                                :bg="getDifficultyColor(problem.difficulty)" icon="trending_up" />
-                            <NeoTab :text="problem.topic" bg="bg-[#E6E6FA]" icon="category" />
-                            <NeoTab :text="problem.lang" bg="bg-[#FFD6A5]" icon="code" />
+                            <NeoTab :text="getDifficultyText(submission.problem_difficulty)"
+                                :bg="getDifficultyColor(submission.problem_difficulty)" icon="trending_up" />
+                            <NeoTab :text="submission.problem_topic" bg="bg-[#E6E6FA]" icon="category" />
                         </div>
-                        <p class="font-medium text-gray-700">{{ problem.description }}</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold mb-2">Restricciones</h3>
-                        <NeoContainer bg="bg-[#EBDFFF]" class="p-4 border border-black shadow-none">
-                            <p class="text-md text-gray-600">{{ problem.constraints }}</p>
-                        </NeoContainer>
-                    </div>
-
-                    <div v-if="problem.examples.length">
-                        <h3 class="font-bold mb-2">Ejemplos</h3>
-                        <div v-for="(ex, i) in problem.examples" :key="i"
-                            class="bg-[#FFEECE] border-2 border-black rounded-lg p-4 mb-2">
-                            <p><strong>Entrada:</strong> {{ ex.input }}</p>
-                            <p><strong>Salida esperada:</strong> {{ ex.output }}</p>
-                        </div>
-                    </div>
-                </NeoContainer>
+                        <p class="font-medium text-gray-700">{{ submission.problem_description }}</p>
+                    </NeoContainer>
+                </div>
             </div>
 
             <div class="lg:col-span-2 space-y-4">
                 <NeoContainer bg="bg-white" class="p-6 space-y-4 flex flex-col">
                     <h3 class="font-bold text-xl">Código enviado por el estudiante</h3>
-                    <MonacoEditor :value="studentCode" :language="problem.lang.toLowerCase() || 'javascript'"
-                        :options="{ readOnly: true }" />
+                    <pre
+                        class="h-64 bg-[#1A1A1A] text-white p-4 border-2 border-black rounded-lg overflow-y-auto font-mono text-xs">
+{{ submission.code }}
+                    </pre>
 
-                    <div v-if="result" class="mt-4">
-                        <h3 class="font-bold">Resultados de la prueba</h3>
-                        <div v-if="Array.isArray(result.message.results)">
-                            <div v-for="(test, i) in result.message.results" :key="i" class="border rounded-lg p-4 my-2"
-                                :class="test.passed ? 'bg-[#96FEAD]' : 'bg-[#FFADAD]'">
-                                <p><strong>#{{ i + 1 }}</strong></p>
-                                <p><strong>Entrada:</strong> {{ test.input }}</p>
-                                <p><strong>Salida esperada:</strong> {{ test.expected_output }}</p>
-                                <p><strong>Salida obtenida:</strong> {{ test.actual_output }}</p>
-                                <p>
-                                    <strong>Resultado:</strong>
-                                    <span :class="test.passed ? 'text-green-700' : 'text-red-700'">
-                                        {{ test.passed ? 'Correcto' : 'Incorrecto' }}
-                                    </span>
-                                </p>
-                            </div>
+
+                    <div v-if="submission.result" class="mt-4">
+                        <h3 class="font-bold">Estado</h3>
+                        <div :class="{
+                            'bg-[#96FEAD]': submission.result === 'accepted',
+                            'bg-[#FFADAD]': submission.result === 'rejected',
+                            'bg-[#FFF3B0]': submission.result === 'pending'
+                        }" class="p-4 rounded-lg border-2 border-black">
+                            <p>
+                                <strong>Resultado: </strong>
+                                <span :class="{
+                                    'text-green-700': submission.result === 'accepted',
+                                    'text-red-700': submission.result === 'rejected',
+                                    'text-yellow-700': submission.result === 'pending'
+                                }">
+                                    {{
+                                        submission.result === 'accepted'
+                                            ? 'Aprobado'
+                                            : submission.result === 'rejected'
+                                                ? 'Devuelto'
+                                                : 'En revisión'
+                                    }}
+                                </span>
+                            </p>
                         </div>
                     </div>
 
+
                     <div>
-                        <label for="mentorComments" class="font-bold mb-1 block">Comentarios del mentor</label>
-                        <textarea id="mentorComments" v-model="comments" rows="5"
-                            class="w-full border border-gray-400 rounded p-2"></textarea>
+                        <label for="mentorComments" class="font-bold mb-1 block">Comentarios</label>
+                        <div class="border-2 border-black rounded-lg bg-white px-3 py-2">
+                            <textarea id="mentorComments" v-model="comments" rows="5"
+                                class="w-full outline-none text-sm bg-transparent resize-none"
+                                placeholder="Genera retroalimentación..."></textarea>
+                        </div>
                     </div>
 
                     <div class="flex justify-end gap-4">
                         <NeoButton text="Aprobar" bg="#96FEAD" icon="check" @click="handleApproval(true)"
                             :disabled="loading" />
-                        <NeoButton text="Rechazar" bg="#FFADAD" icon="close" @click="handleApproval(false)"
+                        <NeoButton text="Devolver" bg="#FFADAD" icon="close" @click="handleApproval(false)"
                             :disabled="loading" />
                     </div>
 
@@ -84,18 +97,14 @@ import { ref, onMounted } from 'vue';
 import NeoContainer from '../components/NeoContainer.vue';
 import NeoButton from '../components/NeoButton.vue';
 import NeoTab from '../components/NeoTab.vue';
-import MonacoEditor from '../components/MonacoEditor.vue';
-import { getProblemByID } from '../services/problemService';
 import { useToast } from 'vue-toastification';
+import { getSolutionByID, updateProblemStatus } from '../services/problemService';
 
 const props = defineProps({
-    id_problem: String,
-    student_id: String, 
+    id_solution: String,
 });
 
-const problem = ref(null);
-const studentCode = ref('');
-const result = ref(null);
+const submission = ref(null);
 const comments = ref('');
 const loading = ref(false);
 const toast = useToast();
@@ -119,23 +128,23 @@ const getDifficultyText = (difficulty) => {
 };
 
 onMounted(async () => {
-    problem.value = await getProblemByID(props.id_problem);
-    // Obtener la solución enviada por el estudiante
-    const submission = await getProblemByID(props.id_problem, res.data.id)
-    if (submission) {
-        studentCode.value = submission.code;
-        result.value = submission.result;
-        comments.value = submission.mentor_comments || '';
-    }
+    const res = await getSolutionByID(props.id_solution);
+    submission.value = res;
+    comments.value = res.comments || '';
 });
 
 const handleApproval = async (approved) => {
     loading.value = true;
     try {
-        const res = await updateProblemStatus(props.id_problem, { problem_id: props.id_problem, student_id: user.data.id, status: approved ? 'completed' : 'pending' })
-        // toast.success(`Solución ${approved ? 'aprobada' : 'rechazada'} correctamente.`);
+        await updateProblemStatus(props.id_problem, {
+            problem_id: props.id_problem,
+            student_id: props.student_id,
+            status: approved ? 'completed' : 'pending',
+            mentor_comments: comments.value,
+        });
+        toast.success(`Solución ${approved ? 'aprobada' : 'rechazada'} correctamente.`);
     } catch (error) {
-        // toast.error('Error al actualizar el estado.');
+        toast.error('Error al actualizar el estado.');
     } finally {
         loading.value = false;
     }
