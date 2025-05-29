@@ -74,7 +74,7 @@ const handleStudentSubmit = async () => {
             toastClassName: "my-custom-toast-class",
         });
         emit('loading')
-        router.push('/home/student/' + response.student_id)
+        router.push("/login")
     } else {
         toast.error(response.message, {
             toastClassName: "my-custom-toast-class",

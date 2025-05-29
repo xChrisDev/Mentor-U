@@ -34,11 +34,18 @@
             </div>
           </div>
         </NeoContainer>
+
       </div>
 
       <div class="lg:col-span-2 space-y-4">
         <NeoContainer bg="bg-white" class="p-6 space-y-4 flex flex-col">
-          <h3 class="font-bold text-xl">Escribe tu solución</h3>
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-xl">Escribe tu solución</h3>
+            <div class="flex items-center gap-3">
+              <NeoTab :text="getStatusTabText(problem.status)" :bg="getStatusTabColor(problem.status)"
+                :icon="getStatusTabIcon(problem.status)" />
+            </div>
+          </div>
           <MonacoEditor v-model="userCode" :language="problem.lang.toLowerCase() || 'javascript'" />
 
           <div class="flex justify-end gap-4">
@@ -91,8 +98,24 @@
           <span class="material-symbols-rounded me-2" style="font-size: 2rem;">
             check_circle
           </span>
-          <h3 class="font-bold text-2xl">Ya has completado esté problema correctamente.</h3>
+          <h3 class="font-bold text-2xl">Asignación completada.</h3>
         </NeoContainer>
+
+        <NeoContainer class="flex flex-col gap-4 p-4" bg="bg-[#EBDFFF]">
+          <h3 class="font-bold text-xl">Comentarios</h3>
+          <div v-for="s in solution" :key="s.id" class="bg-white border-2 border-black rounded-lg p-4 shadow-sm">
+            <template v-if="s && s.comments">
+              <p class="font-medium text-gray-800">
+                <span class="font-black">Mentor: </span>{{ s.comments }}
+              </p>
+              <p class="text-sm text-gray-500 mt-2">
+                Fecha: {{ new Date(s.created_at).toLocaleString() }}
+              </p>
+            </template>
+            <p class="font-medium text-gray-700" v-else>No hay comentarios :(</p>
+          </div>
+        </NeoContainer>
+
       </div>
     </div>
   </div>
@@ -105,7 +128,7 @@ import NeoContainer from '../components/NeoContainer.vue';
 import NeoButton from '../components/NeoButton.vue';
 import NeoTab from '../components/NeoTab.vue';
 import MonacoEditor from '../components/MonacoEditor.vue';
-import { getProblemByID, postStudentSolution, updateProblemStatus } from '../services/problemService';
+import { getProblemByID, getSolutionByCompositeKey, postStudentSolution, updateProblemStatus } from '../services/problemService';
 import { useAuth } from '../composables/useAuth';
 import { testCode } from '../services/problemService';
 import { useToast } from 'vue-toastification';
@@ -122,7 +145,8 @@ const userCode = ref('');
 const result = ref(null);
 const isTested = ref(false);
 const isEval = ref(false);
-const toast = useToast()
+const toast = useToast();
+const solution = ref(null);
 
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
@@ -149,7 +173,7 @@ const testingCode = async () => {
     code: userCode.value,
     examples: problem.value.examples
   });
-  console.log(res);
+  // console.log(res);
   result.value = res;
 
   const passedAll = Array.isArray(res.message.results)
@@ -160,6 +184,33 @@ const testingCode = async () => {
   isEval.value = false
 };
 
+
+const getStatusTabText = (status) => {
+  switch (status) {
+    case 'completed': return 'Completado';
+    case 'pending': return 'Pendiente';
+    case 'in_revision': return 'En Revisión';
+    default: return 'Desconocido';
+  }
+};
+
+const getStatusTabColor = (status) => {
+  switch (status) {
+    case 'completed': return 'bg-[#96FEAD]';
+    case 'pending': return 'bg-[#FFADAD]';
+    case 'in_revision': return 'bg-[#FFD6A5]';
+    default: return 'bg-gray-300';
+  }
+};
+
+const getStatusTabIcon = (status) => {
+  switch (status) {
+    case 'completed': return 'check_circle';
+    case 'pending': return 'radio_button_unchecked';
+    case 'in_revision': return 'hourglass_empty';
+    default: return 'help';
+  }
+};
 
 const submitSolution = async () => {
   try {
@@ -181,6 +232,8 @@ const submitSolution = async () => {
 onMounted(async () => {
   const res = await fetchUser();
   problem.value = await getProblemByID(props.id_problem, res.data.id)
-  // console.log(problem.value)
+  solution.value = await getSolutionByCompositeKey(props.id_problem, res.data.id, props.id_mentorie)
+  userCode.value = solution.value?.code || '';
+  console.log(solution.value[0])
 })
 </script>

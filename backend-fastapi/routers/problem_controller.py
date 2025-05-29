@@ -268,6 +268,49 @@ def get_solution_by_id(solution_id: int):
         )
 
         return result
+    
+@router.get("/student-solutions/find/", response_model=List[StudentSolutionWithDetails])
+def get_solutions_by_composite_key(problem_id: int, student_id: int, mentorie_id: int):
+    with Session(engine) as session:
+        # Paso 1: obtener todas las soluciones que coincidan con los tres filtros
+        solutions = session.exec(
+            select(StudentSolution).where(
+                (StudentSolution.problem_id == problem_id) &
+                (StudentSolution.student_id == student_id) &
+                (StudentSolution.mentorie_id == mentorie_id)
+            )
+        ).all()
+
+        # Paso 2: construir la lista de respuestas detalladas
+        results = []
+        for solution in solutions:
+            result = StudentSolutionWithDetails(
+                id=solution.id,
+                problem_id=solution.problem_id,
+                student_id=solution.student_id,
+                mentorie_id=solution.mentorie_id,
+                code=solution.code,
+                comments=solution.comments,
+                result=solution.result,
+                created_at=solution.created_at,
+                updated_at=solution.updated_at,
+
+                problem_title=solution.problem.title,
+                problem_description=solution.problem.description,
+                problem_difficulty=solution.problem.difficulty,
+                problem_topic=solution.problem.topic,
+
+                student_name=solution.student.name,
+                student_surname=solution.student.surname,
+                student_photo=solution.student.profile_picture,
+
+                mentorie_title=solution.mentory.title,
+                mentorie_description=solution.mentory.description,
+            )
+            results.append(result)
+
+        return results
+
 
             
 @router.get("/student-solutions/", response_model=List[StudentSolutionWithDetails])

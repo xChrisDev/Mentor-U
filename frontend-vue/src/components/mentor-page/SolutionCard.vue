@@ -60,7 +60,7 @@ const getStatusColor = (status) => {
             <div class="flex gap-4 items-center">
                 <img :src="student_photo" :alt="`${student_name} ${student_surname}`"
                     class="w-14 h-14 border-2 border-black rounded-full object-cover" />
-                <div>
+                <div class="flex flex-col gap-1">
                     <p class="font-bold leading-4">{{ student_name }} {{ student_surname }}</p>
                     <p class="text-sm text-gray-600 leading-4">{{ mentorie_title }}</p>
                 </div>

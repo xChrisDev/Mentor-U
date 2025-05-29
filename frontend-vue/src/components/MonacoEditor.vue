@@ -29,7 +29,7 @@ onMounted(async () => {
     value: props.modelValue,
     language: props.language,
     theme: 'vs-dark',
-    fontSize: 14,
+    fontSize: 18,
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
     wordWrap: 'on',

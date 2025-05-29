@@ -48,13 +48,13 @@
           <div class="relative group">
             <NeoContainer bg="bg-[#FFD6A5]" class="flex items-center justify-center px-4 cursor-default">
               <span class="material-symbols-rounded mr-2">workspace_premium</span>
-              <h3 class="text-xl font-extrabold">0
+              <h3 class="text-xl font-extrabold">{{ getCertifieds() }}
               </h3>
             </NeoContainer>
 
             <div class="absolute -top-10 left-1/2 -translate-x-1/2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all
     bg-white border-[3px] border-black text-sm font-semibold px-3 py-1 rounded-xl z-10 whitespace-nowrap">
-              Certificados obtenidos
+              Mentorías completadas
             </div>
           </div>
 
@@ -174,6 +174,12 @@ const fetchAllMentories = async () => {
     isLoading.value = false;
   }
 };
+
+const getCertifieds = () => {
+  let count = 0
+  enrolledMentories.value.forEach((mentorie) => mentorie.status == 'completed' ? count++ : count = count)
+  return count
+}
 
 const fetchEnrolledMentories = async () => {
   isLoading.value = true;

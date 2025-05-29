@@ -41,7 +41,7 @@
                     </pre>
 
 
-                    <div v-if="submission.result" class="mt-4">
+                    <div v-if="submission.result" class="mt-2">
                         <h3 class="font-bold">Estado</h3>
                         <div :class="{
                             'bg-[#96FEAD]': submission.result === 'accepted',
@@ -66,7 +66,6 @@
                             </p>
                         </div>
                     </div>
-
 
                     <div>
                         <label for="mentorComments" class="font-bold mb-1 block">Comentarios</label>
@@ -98,7 +97,7 @@ import NeoContainer from '../components/NeoContainer.vue';
 import NeoButton from '../components/NeoButton.vue';
 import NeoTab from '../components/NeoTab.vue';
 import { useToast } from 'vue-toastification';
-import { getSolutionByID, updateProblemStatus } from '../services/problemService';
+import { getSolutionByID, updateProblemStatus, updateStudentSolution } from '../services/problemService';
 
 const props = defineProps({
     id_solution: String,
@@ -136,15 +135,26 @@ onMounted(async () => {
 const handleApproval = async (approved) => {
     loading.value = true;
     try {
-        await updateProblemStatus(props.id_problem, {
-            problem_id: props.id_problem,
-            student_id: props.student_id,
-            status: approved ? 'completed' : 'pending',
-            mentor_comments: comments.value,
+        await updateProblemStatus(submission.value.problem_id, {
+            problem_id: submission.value.problem_id,
+            student_id: submission.value.student_id,
+            status: approved ? 'completed' : 'pending'
         });
-        toast.success(`Solución ${approved ? 'aprobada' : 'rechazada'} correctamente.`);
+        await updateStudentSolution(submission.value.id, {
+            code: submission.code,
+            comments: comments.value,
+            result: approved ? 'accepted' : 'rejected'
+        })
+        toast.success(`Solución ${approved ? 'aprobada' : 'devuelta'} correctamente.`, {
+            toastClassName: "my-custom-toast-class",
+        });
+        const res = await getSolutionByID(props.id_solution);
+        submission.value = res;
+        comments.value = res.comments || '';
     } catch (error) {
-        toast.error('Error al actualizar el estado.');
+        toast.error('Error al actualizar el estado.', {
+            toastClassName: "my-custom-toast-class",
+        });
     } finally {
         loading.value = false;
     }

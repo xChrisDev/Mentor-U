@@ -49,6 +49,26 @@ export const getSolutionByID = async (id) => {
   }
 };
 
+export const getSolutionByCompositeKey = async (problemId, studentId, mentorieId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/api/problems/student-solutions/find/`,
+      {
+        params: {
+          problem_id: problemId,
+          student_id: studentId,
+          mentorie_id: mentorieId,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return { message: "Error inesperado al obtener la solución" };
+  }
+};
+
+
 export const getProblemByID = async (id_problem, id_student) => {
   try {
     const response = await axios.get(
@@ -97,6 +117,19 @@ export const postStudentSolution = async (data) => {
   } catch (error) {
     console.log(error);
     return { message: "Error inesperado al agregar solucion" };
+  }
+};
+
+export const updateStudentSolution = async (solution_id, data) => {
+  try {
+    const response = await axios.put(
+      `http://127.0.0.1:8000/api/problems/student-solutions/${solution_id}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return { message: "Error inesperado al actualizar solucion" };
   }
 };
 
